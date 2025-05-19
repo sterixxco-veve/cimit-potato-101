@@ -45,6 +45,7 @@ public class CimitPotato101 extends JFrame {
             e.printStackTrace();
             System.out.println("Error loading background image: " + e.getMessage());
         }
+        
 
         JLabel backgroundLabel = new JLabel(backgroundImageIcon);
         backgroundLabel.setBounds(0, 0, backgroundImageIcon.getIconWidth(), backgroundImageIcon.getIconHeight());
