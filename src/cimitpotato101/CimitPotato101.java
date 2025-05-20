@@ -15,11 +15,13 @@ import javax.swing.SwingUtilities;
 public class CimitPotato101{
 
     public CimitPotato101() {
-        MainPanel mainMenu = new MainPanel(); // tampilkan GUI dari constructor
+//        MainPanel mainMenu = new MainPanel(); // tampilkan GUI dari constructor
+//        GamePanel framePlay = new GamePanel();
     }
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new CimitPotato101());
+//        SwingUtilities.invokeLater(() -> new CimitPotato101());
+        SwingUtilities.invokeLater(() -> new GamePanel()); // Ini akan menampilkan JFrame
     }
 }
 
