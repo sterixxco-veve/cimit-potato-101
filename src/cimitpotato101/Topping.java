@@ -1,19 +1,31 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cimitpotato101;
+
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 
 /**
  *
- * @author Aspire
+ * @author Gracia Krisnanda
  */
-public abstract class Topping implements MenuItem{
-    protected String nama;
-    protected int value;
+public class Topping implements MenuItem {
+    private String nama;
+    private int harga;
+    private int time;
+    private String kategori; // "sauce" atau "topping"
+    protected int upgradeLevel;
+    protected String imagePath;
 
-    
+    public Topping(String nama, int harga, String kategori, int level, String imagePath) {
+        this.nama = nama;
+        this.harga = harga;
+        this.time = 0;
+        this.kategori = kategori.toLowerCase();
+        this.upgradeLevel = level;
+        this.imagePath = imagePath;
+    }
+
     @Override
     public String getNama() {
         return nama;
@@ -21,12 +33,25 @@ public abstract class Topping implements MenuItem{
 
     @Override
     public int getHarga() {
-        return value;
+        return harga;
     }
 
     @Override
-    public int getWaktuMasak() {
-        return 0;
+    public int getTime() {
+        return time;
     }
-}
 
+    public String getKategori() {
+        return kategori;
+    }
+    
+    public void setUpgradeLevel(int level) {
+        this.upgradeLevel = level;
+    }
+    
+    public String getImagePath() {
+        return imagePath;
+    }
+    
+    
+}
