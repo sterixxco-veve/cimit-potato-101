@@ -87,7 +87,7 @@ public class MenuUnlock {
     }
 
     private static String getPotatoImage(String name) {
-        return "img/potato_" + name.toLowerCase() + ".png";
+        return "assets/potato_" + name.toLowerCase() + ".png";
     }
 
     private static int getToppingPrice(String name) {
@@ -100,7 +100,7 @@ public class MenuUnlock {
     }
 
     private static String getToppingImage(String name) {
-        return "img/topping_" + name.toLowerCase() + ".png";
+        return "assets/topping_" + name.toLowerCase() + ".png";
     }
 
     private static List<String> createList(String... items) {
