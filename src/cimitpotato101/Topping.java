@@ -11,6 +11,7 @@ package cimitpotato101;
  */
 public class Topping implements MenuItem {
     private String nama;
+    
     private int harga;
     private int time;
     private String kategori; // "sauce" atau "topping"
