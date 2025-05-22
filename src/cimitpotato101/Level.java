@@ -20,7 +20,7 @@ public class Level {
     private BoosterTier booster;
     private List<MenuItem> unlockedItems;
     private List<Customer> customers;
-    
+    private List<Oven> ovens;
 
     public Level(int levelNumber, int goal, int duration, List<MenuItem> unlockedItems, List<Customer> customer, BoosterTier booster) {
         this.levelNumber = levelNumber;
@@ -29,6 +29,22 @@ public class Level {
         this.unlockedItems = unlockedItems;
         this.customers = customers;
         this.booster = booster;
+        this.ovens = createOvens();
+    }
+    
+    private List<Oven> createOvens() {
+        return List.of(
+            new Oven("Regular"),
+            new Oven("Curly"),
+            new Oven("Chips"),
+            new Oven("Wedges"),
+            new Oven("Tornado"),
+            new Oven("Mashed")
+        );
+    }
+
+    public List<Oven> getOvens() {
+        return ovens;
     }
 
     public int getLevelNumber() {
