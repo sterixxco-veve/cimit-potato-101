@@ -149,7 +149,7 @@ class SlotPanel extends JPanel {
     public SlotPanel(MainPanel mainFrame) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(50, 40, 50, 40)); // top, left, bottom, right
-        JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 0));
+        JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
         rowPanel.setOpaque(false);
 
         // Load gambar background
