@@ -2,6 +2,7 @@ package cimitpotato101;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -33,7 +34,7 @@ public class Level {
     }
     
     private List<Oven> createOvens() {
-        return List.of(
+        return Arrays.asList(
             new Oven("Regular"),
             new Oven("Curly"),
             new Oven("Chips"),
@@ -42,6 +43,7 @@ public class Level {
             new Oven("Mashed")
         );
     }
+
 
     public List<Oven> getOvens() {
         return ovens;
