@@ -3,9 +3,27 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< Updated upstream
             <file>file:/E:/S2/OOP/cimit-potato-101/src/cimitpotato101/Topping.java</file>
             <file>file:/E:/S2/OOP/cimit-potato-101/src/cimitpotato101/Level.java</file>
             <file>file:/E:/S2/OOP/cimit-potato-101/src/cimitpotato101/Oven.java</file>
+=======
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/Potato.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/MenuItem.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/CustomerOrderManager.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/CustomerOrderTemplate.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/CimitPotato101.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/MainPanel.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/SaveObject.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/BoosterManager.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/MenuManager.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/Topping.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/Player.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/Customer.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/CustomerFactory.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/MenuUnlock.java</file>
+            <file>file:/C:/Users/Aspire/Downloads/KULIAH%20EVEE/SMT2/PBO/cimit-potato-010/cimit-potato-010/src/cimitpotato101/Level.java</file>
+>>>>>>> Stashed changes
         </group>
     </open-files>
 </project-private>
