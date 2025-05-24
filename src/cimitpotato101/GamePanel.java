@@ -119,11 +119,27 @@ public class GamePanel extends JPanel {
                         } else if (oven.isReady()) {                            
                             for (int i = 0; i < arrKentang.length ; i++){
                                 if (arrKentang[i] instanceof EmptyPotato){
-                                    if (oven.getOvenName() == "Regular"){
-                                        arrKentang[i] = new RegularPotato();
-                                    }
-                                    else if (oven.getOvenName() == "Curly"){
-                                        arrKentang[i] = new CurlyPotato();
+                                    if (null != oven.getOvenName())switch (oven.getOvenName()) {
+                                        case "Regular":
+                                            arrKentang[i] = new RegularPotato();
+                                            break;
+                                        case "Curly":
+                                            arrKentang[i] = new CurlyPotato();
+                                            break;
+                                        case "Chips":
+                                            arrKentang[i] = new ChipsPotato();
+                                            break;
+                                        case "Wedges" :
+                                            arrKentang[i] = new WedgesPotato();
+                                            break;
+                                        case "Tornado" :
+                                            arrKentang[i] = new TornadoPotato();
+                                            break;
+                                        case "Mashed" :
+                                            arrKentang[i] = new MashedPotato();
+                                            break;
+                                        default:
+                                            break;
                                     }
                                     String result = oven.takeOut();
                                     String ovenPath = "/assets/oven.png";
@@ -164,35 +180,10 @@ public class GamePanel extends JPanel {
                 piring.add(piringLabel);
                 piringLabels[i] = piringLabel;
                 
-//                ovenLogic[i] = new Oven(ovenNames[i]);
+
                 final int index = i;
                 piringLabel.addMouseListener(new MouseAdapter() {
                     public void mouseClicked(MouseEvent e) {
-//                        Oven oven = ovenLogic[index];
-//                        
-//                        System.out.println("Clicked "+index);
-//
-//                        if (!oven.isOccupied()) {
-//                            String potatoName = ovenNames[index] + " Potato";
-//                            boolean started = oven.startCooking(potatoName, 5000); // 5 detik
-//                            if (started) {
-//                                JOptionPane.showMessageDialog(null, "Masak dimulai di Oven " + oven.getOvenName() + " Potato");
-//                            }
-//                        } else if (oven.isReady()) {
-//                            String result = oven.takeOut();
-//                            JOptionPane.showMessageDialog(null, oven.getOvenName() + " selesai! Hasil: " + result);
-//                            for (int i = 0; i < arrKentang.length ; i++){
-//                                if (arrKentang[i] instanceof EmptyPotato){
-//                                    if (oven.getOvenName() == "Regular"){
-//                                        arrKentang[i] = new RegularPotato();
-//                                        break;
-//                                    }
-//                                }
-//                            }
-//                        } else {
-//                            long remaining = oven.getRemainingTimeMs() / 1000;
-//                            JOptionPane.showMessageDialog(null, "Masih dimasak (" + remaining + " detik lagi)");
-//                        }
                         if (SwingUtilities.isRightMouseButton(e)) {
                             arrKentang[index] = new EmptyPotato();
                         }

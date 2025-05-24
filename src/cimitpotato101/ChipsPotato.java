@@ -9,8 +9,8 @@ package cimitpotato101;
  *
  * @author Aspire
  */
-public class RegularPotato extends Potato{
-    public RegularPotato() {
-        super("Regular Potato", 0, 0, "/assets/potatoRegular.png");
+public class ChipsPotato extends Potato{
+    public ChipsPotato() {
+        super("Chips Potato", 0, 0, "/assets/potatoChips.png");
     }
 }
