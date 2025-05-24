@@ -21,7 +21,7 @@ public class Level {
     private BoosterTier booster;
     private List<MenuItem> unlockedItems;
     private List<Customer> customers;
-    private List<Oven> ovens;
+    private Oven[] ovens;
 
     public Level(int levelNumber, int goal, int duration, List<MenuItem> unlockedItems, List<Customer> customer, BoosterTier booster) {
         this.levelNumber = levelNumber;
@@ -33,19 +33,18 @@ public class Level {
         this.ovens = createOvens();
     }
     
-    private List<Oven> createOvens() {
-        return Arrays.asList(
-            new Oven("Regular"),
-            new Oven("Curly"),
-            new Oven("Chips"),
-            new Oven("Wedges"),
-            new Oven("Tornado"),
-            new Oven("Mashed")
-        );
+    private Oven[] createOvens() {
+        Oven[] oven = {new Oven("Regular", 5000),
+            new Oven("Curly", 7000),
+            new Oven("Chips", 7500),
+            new Oven("Wedges", 8000),
+            new Oven("Tornado", 9000),
+            new Oven("Mashed", 10000)};
+        return oven;
     }
 
 
-    public List<Oven> getOvens() {
+    public Oven[] getOvens() {
         return ovens;
     }
 

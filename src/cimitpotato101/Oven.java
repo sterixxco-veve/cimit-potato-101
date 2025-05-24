@@ -16,19 +16,20 @@ public class Oven {
     private boolean isOccupied;         // Apakah oven sedang digunakan
     private boolean isDone;             // Apakah masakannya sudah selesai
 
-    public Oven(String ovenName) {
+    public Oven(String ovenName, long cookDuration) {
         this.ovenName = ovenName;
         this.isOccupied = false;
+        this.cookDuration = cookDuration;
         this.isDone = false;
     }
 
     // Mulai masak kentang
-    public boolean startCooking(String potatoType, long cookDurationMs) {
+    public boolean startCooking(String potatoType) {
         if (isOccupied) return false; // Oven sedang dipakai
 
         this.potatoType = potatoType;
         this.cookStartTime = System.currentTimeMillis();
-        this.cookDuration = cookDurationMs;
+//        this.cookDuration = cookDurationMs;
         this.isOccupied = true;
         this.isDone = false;
         return true;
