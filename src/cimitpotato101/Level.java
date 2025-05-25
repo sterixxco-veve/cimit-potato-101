@@ -34,12 +34,12 @@ public class Level {
     }
     
     private Oven[] createOvens() {
-        Oven[] oven = {new Oven("Regular", 5000),
-            new Oven("Curly", 7000),
-            new Oven("Chips", 7500),
-            new Oven("Wedges", 8000),
-            new Oven("Tornado", 9000),
-            new Oven("Mashed", 10000)};
+        Oven[] oven = {new Oven("Regular", 3000),
+            new Oven("Curly", 3500),
+            new Oven("Chips", 5000),
+            new Oven("Wedges", 5500),
+            new Oven("Tornado", 4000),
+            new Oven("Mashed", 7000)};
         return oven;
     }
 
