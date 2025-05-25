@@ -17,9 +17,12 @@ import java.util.Map;
 public class CustomerOrderManager {
     private static final Map<Integer, Integer> customerCountByLevel = new HashMap<>();
     private static final Map<Integer, List<CustomerOrderTemplate>> orderTemplates = new HashMap<>();
+    // Variabel baru untuk menyimpan goal dan durasi per level
+    private static final Map<Integer, Integer> levelGoals = new HashMap<>();
+    private static final Map<Integer, Integer> levelDurations = new HashMap<>(); // Durasi dalam detik
 
     static {
-        // Inisialisasi customerCountByLevel (pengganti Map.of)
+        // Inisialisasi customerCountByLevel
         customerCountByLevel.put(1, 8);
         customerCountByLevel.put(2, 10);
         customerCountByLevel.put(3, 12);
@@ -88,6 +91,30 @@ public class CustomerOrderManager {
         level10Orders.add(new CustomerOrderTemplate("Tornado", "Bacon", null, false));
         level10Orders.add(new CustomerOrderTemplate("Wedges", "Pepperoni", "Mayo", true));
         orderTemplates.put(10, level10Orders);
+
+        // Inisialisasi Goal per Level (contoh: target koin/skor)
+        levelGoals.put(1, 50);    // Goal untuk Level 1
+        levelGoals.put(2, 75);
+        levelGoals.put(3, 100);
+        levelGoals.put(4, 125);
+        levelGoals.put(5, 150);
+        levelGoals.put(6, 175);
+        levelGoals.put(7, 200);
+        levelGoals.put(8, 225);
+        levelGoals.put(9, 250);
+        levelGoals.put(10, 300);
+
+        // Inisialisasi Durasi per Level (dalam detik)
+        levelDurations.put(1, 180); // Durasi Level 1 = 3 menit
+        levelDurations.put(2, 170);
+        levelDurations.put(3, 160);
+        levelDurations.put(4, 150);
+        levelDurations.put(5, 140);
+        levelDurations.put(6, 130);
+        levelDurations.put(7, 120); // 2 menit
+        levelDurations.put(8, 110);
+        levelDurations.put(9, 100);
+        levelDurations.put(10, 90); // 1.5 menit
     }
 
     public static List<CustomerOrderTemplate> getTemplatesForLevel(int level) {
@@ -95,6 +122,16 @@ public class CustomerOrderManager {
     }
 
     public static int getCustomerCountForLevel(int level) {
-        return customerCountByLevel.getOrDefault(level, 8);
+        return customerCountByLevel.getOrDefault(level, 8); // Default 8 customer jika level tidak ada
+    }
+
+    // **** METODE BARU UNTUK GOAL ****
+    public static int getGoalForLevel(int level) {
+        return levelGoals.getOrDefault(level, 50); // Default goal 50 jika level tidak ada
+    }
+
+    // **** METODE BARU UNTUK DURASI ****
+    public static int getDurationForLevel(int level) {
+        return levelDurations.getOrDefault(level, 180); // Default durasi 180 detik jika level tidak ada
     }
 }
