@@ -17,9 +17,11 @@ import java.util.Map;
 public class CustomerOrderManager {
     private static final Map<Integer, Integer> customerCountByLevel = new HashMap<>();
     private static final Map<Integer, List<CustomerOrderTemplate>> orderTemplates = new HashMap<>();
-    // Variabel baru untuk menyimpan goal dan durasi per level
-    private static final Map<Integer, Integer> levelGoals = new HashMap<>();
-    private static final Map<Integer, Integer> levelDurations = new HashMap<>(); // Durasi dalam detik
+    private static final Map<Integer, Integer> levelGoalsOld = new HashMap<>(); // Target gold lama, mungkin tidak terpakai
+    private static final Map<Integer, Integer> levelDurations = new HashMap<>(); 
+    
+    // Struktur baru untuk menyimpan kriteria bintang: Level -> {skor_1_bintang, skor_2_bintang, skor_3_bintang}
+    private static final Map<Integer, int[]> starCriteriaByLevel = new HashMap<>();
 
     static {
         // Inisialisasi customerCountByLevel
@@ -92,29 +94,30 @@ public class CustomerOrderManager {
         level10Orders.add(new CustomerOrderTemplate("Wedges", "Pepperoni", "Mayo", true));
         orderTemplates.put(10, level10Orders);
 
-        // Inisialisasi Goal per Level (contoh: target koin/skor)
-        levelGoals.put(1, 50);    // Goal untuk Level 1
-        levelGoals.put(2, 75);
-        levelGoals.put(3, 100);
-        levelGoals.put(4, 125);
-        levelGoals.put(5, 150);
-        levelGoals.put(6, 175);
-        levelGoals.put(7, 200);
-        levelGoals.put(8, 225);
-        levelGoals.put(9, 250);
-        levelGoals.put(10, 300);
-
         // Inisialisasi Durasi per Level (dalam detik)
-        levelDurations.put(1, 180); // Durasi Level 1 = 3 menit
+        levelDurations.put(1, 180); 
         levelDurations.put(2, 170);
         levelDurations.put(3, 160);
         levelDurations.put(4, 150);
         levelDurations.put(5, 140);
         levelDurations.put(6, 130);
-        levelDurations.put(7, 120); // 2 menit
+        levelDurations.put(7, 120); 
         levelDurations.put(8, 110);
         levelDurations.put(9, 100);
-        levelDurations.put(10, 90); // 1.5 menit
+        levelDurations.put(10, 90); 
+
+        // Inisialisasi Kriteria Bintang (Skor Gold yang dibutuhkan)
+        // Format: {skor_untuk_1_bintang, skor_untuk_2_bintang, skor_untuk_3_bintang}
+        starCriteriaByLevel.put(1, new int[]{50, 65, 80});
+        starCriteriaByLevel.put(2, new int[]{70, 91, 112});
+        starCriteriaByLevel.put(3, new int[]{90, 117, 144});
+        starCriteriaByLevel.put(4, new int[]{120, 156, 192});
+        starCriteriaByLevel.put(5, new int[]{150, 195, 240});
+        starCriteriaByLevel.put(6, new int[]{180, 234, 288});
+        starCriteriaByLevel.put(7, new int[]{220, 286, 352});
+        starCriteriaByLevel.put(8, new int[]{270, 351, 432});
+        starCriteriaByLevel.put(9, new int[]{330, 429, 528});
+        starCriteriaByLevel.put(10, new int[]{400, 520, 640});
     }
 
     public static List<CustomerOrderTemplate> getTemplatesForLevel(int level) {
@@ -122,16 +125,26 @@ public class CustomerOrderManager {
     }
 
     public static int getCustomerCountForLevel(int level) {
-        return customerCountByLevel.getOrDefault(level, 8); // Default 8 customer jika level tidak ada
+        return customerCountByLevel.getOrDefault(level, 8); 
     }
 
-    // **** METODE BARU UNTUK GOAL ****
+    // Goal di sini adalah skor minimal untuk 1 bintang (menyelesaikan level)
     public static int getGoalForLevel(int level) {
-        return levelGoals.getOrDefault(level, 50); // Default goal 50 jika level tidak ada
+        int[] criteria = starCriteriaByLevel.get(level);
+        if (criteria != null && criteria.length > 0) {
+            return criteria[0]; // Target gold = skor untuk 1 bintang
+        }
+        // Fallback jika kriteria tidak ada untuk level tersebut (seharusnya tidak terjadi jika semua level diisi)
+        return 50; 
     }
 
-    // **** METODE BARU UNTUK DURASI ****
     public static int getDurationForLevel(int level) {
-        return levelDurations.getOrDefault(level, 180); // Default durasi 180 detik jika level tidak ada
+        return levelDurations.getOrDefault(level, 180); 
+    }
+
+    // Metode baru untuk mendapatkan kriteria bintang
+    public static int[] getStarCriteriaForLevel(int level) {
+        // Mengembalikan array kriteria, atau array default jika level tidak ditemukan
+        return starCriteriaByLevel.getOrDefault(level, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE}); 
     }
 }

@@ -29,8 +29,8 @@ public class MainPanel extends JFrame {
         cardPanel = new JPanel(cardLayout);
 
         // Tambahkan panel-panel ke dalam CardLayout
-        cardPanel.add(new MenuPanel(this), "menu"); //
-        cardPanel.add(new SlotPanel(this), "slots"); //
+        cardPanel.add(new MenuPanel(this), "menu"); 
+        cardPanel.add(new SlotPanel(this), "slots"); 
         // Jangan tambahkan GamePanel di sini jika akan dibuat dinamis
         // cardPanel.add(new GamePanel(), "game"); // HAPUS ATAU KOMENTARI BARIS INI
 
@@ -46,34 +46,31 @@ public class MainPanel extends JFrame {
         return cardPanel;
     }
 
-    // **** TAMBAHKAN METODE INI ****
-    public void startGame(SaveSlotData slotData) {
+    // Metode startGame diubah untuk menerima slotNumber
+    public void startGame(SaveSlotData slotData, int slotNumber) {
         // 1. Buat atau muat Player berdasarkan slotData
         Player gamePlayer = loadOrCreatePlayer(slotData); 
 
-        // 2. Level yang akan dimainkan (dari slotData, yang sudah diatur ke 1 oleh SlotCard)
-        int levelToPlay = slotData.getLevel(); //
+        // 2. Level yang akan dimainkan (dari slotData)
+        int levelToPlay = slotData.getLevel(); 
 
-        // 3. Buat instance GamePanel baru dengan data pemain dan level
-        // Pastikan GamePanel memiliki constructor (Player, int, MainPanel)
-        GamePanel newGamePanel = new GamePanel(gamePlayer, levelToPlay, this);
+        // 3. Buat instance GamePanel baru dengan data pemain, level, MainPanel, dan slotNumber
+        GamePanel newGamePanel = new GamePanel(gamePlayer, levelToPlay, this, slotNumber);
 
         // 4. Ganti panel game yang ada di CardLayout dan tampilkan
-        // Gunakan nama unik jika Anda membuat instance baru setiap kali agar CardLayout bisa menggantinya
-        String gamePanelId = "game_instance_" + System.currentTimeMillis(); // Nama unik
+        String gamePanelId = "game_instance_" + System.currentTimeMillis(); 
         cardPanel.add(newGamePanel, gamePanelId); 
         cardLayout.show(cardPanel, gamePanelId); 
     }
 
-    // **** TAMBAHKAN METODE INI JUGA ****
     // Implementasi loadOrCreatePlayer (sesuaikan dengan kebutuhan save/load Anda)
     private Player loadOrCreatePlayer(SaveSlotData slotData) {
         // Untuk tes Level 1, kita bisa buat Player baru setiap kali
-        Player player = new Player(slotData.getPlayerName()); // Menggunakan constructor Player(String nama)
-        player.setCurrentLevel(slotData.getLevel()); // Ini akan selalu 1
-        player.setStars(slotData.getStars()); //
-        player.setGold(100); // Beri gold awal untuk tes
-        player.initializeUpgradeLevels(); // Pastikan map upgrade diinisialisasi
+        Player player = new Player(slotData.getPlayerName()); 
+        player.setCurrentLevel(slotData.getLevel()); 
+        player.setStars(slotData.getStars()); 
+        player.setGold(0); // Set gold awal menjadi 0, atau sesuai logika game Anda
+        player.initializeUpgradeLevels(); 
 
         // (Opsional) Jika Anda punya sistem save/load Player yang lebih lengkap, integrasikan di sini.
         // Contoh:
@@ -83,16 +80,16 @@ public class MainPanel extends JFrame {
         //     for (Player p : allPlayers) {
         //         if (p.getUsername().equalsIgnoreCase(slotData.getPlayerName())) {
         //             existingPlayer = p;
+        //             // Jika pemain sudah ada, muat gold mereka
+        //             // player.setGold(existingPlayer.getGold()); // Asumsi Player punya metode getGold() yang benar
         //             break;
         //         }
         //     }
         // }
         // if (existingPlayer != null) {
-        //     // Update data pemain yang ada
-        //     existingPlayer.setCurrentLevel(slotData.getLevel());
-        //     existingPlayer.setStars(slotData.getStars());
-        //     // ... (update gold jika perlu)
-        //     player = existingPlayer;
+        //     player = existingPlayer; // Gunakan pemain yang sudah ada
+        //     player.setCurrentLevel(slotData.getLevel()); // Pastikan level sesuai dengan slot yang dipilih
+        //     player.setStars(slotData.getStars());
         // } else {
         //     // Pemain baru, tambahkan ke daftar dan simpan (jika perlu)
         //     if (allPlayers == null) {

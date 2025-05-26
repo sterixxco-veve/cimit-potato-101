@@ -55,11 +55,14 @@ public class GamePanel extends JPanel {
     private Timer gameTimer; 
     private Timer updateTimer; 
     private boolean timerStarted = false;
+    private boolean gameEnded = false; 
+    private boolean isPaused = false; // Flag untuk status pause
 
     private Player currentPlayer;
     private int currentLevelNumber;
     private Level activeLevel;
     private MainPanel mainFrame;
+    private int gameSlotNumber; 
 
     // Variabel untuk Customer Display
     private Queue<Customer> customerQueue; 
@@ -69,36 +72,36 @@ public class GamePanel extends JPanel {
     private JLabel[] customerOrderLabels; 
 
     // Variabel untuk Info UI Atas
-    private JLabel customersRemainingLabel;
-    private JLabel goldLabel;
+    private JLabel customersInfoLabel; 
+    private JLabel goldInfoLabel;    
     private int totalCustomersForLevel;
-    private int customersServedCount;
+    private int customersLeftInLevel; 
 
 
     // Koordinat dan ukuran untuk elemen customer (BERJAJAR KE KANAN)
-    private final int CUSTOMER_START_X = 150; 
+    private final int CUSTOMER_START_X = 70; 
     private final int CUSTOMER_START_Y = 140;  
-    private final int CUSTOMER_SLOT_WIDTH = 220; 
-    private final int CUSTOMER_SLOT_HEIGHT = 95; 
-    private final int CUSTOMER_SLOT_SPACING_X = 20; 
+    private final int CUSTOMER_SLOT_WIDTH = 270; 
+    private final int CUSTOMER_SLOT_HEIGHT = 125; 
+    private final int CUSTOMER_SLOT_SPACING_X = 15; 
     
     private final int CUSTOMER_IMAGE_X = 5; 
     private final int CUSTOMER_IMAGE_Y = 5; 
-    private final int CUSTOMER_IMAGE_SIZE = 70; // Target ukuran bounding box untuk gambar customer
+    private final int CUSTOMER_IMAGE_SIZE = 105; 
     
     private final int ORDER_BUBBLE_X_OFFSET = CUSTOMER_IMAGE_X + CUSTOMER_IMAGE_SIZE + 5; 
     private final int ORDER_BUBBLE_Y = 5; 
-    private final int ORDER_BUBBLE_WIDTH = CUSTOMER_SLOT_WIDTH - ORDER_BUBBLE_X_OFFSET - 5; 
+    private final int ORDER_BUBBLE_WIDTH = CUSTOMER_SLOT_WIDTH - ORDER_BUBBLE_X_OFFSET - 10; 
     private final int ORDER_BUBBLE_HEIGHT = CUSTOMER_SLOT_HEIGHT - 10; 
 
     private final int MAX_VISIBLE_CUSTOMERS = 3; 
 
 
-    public GamePanel(Player player, int levelNumber, MainPanel mainFrameRef) {
+    public GamePanel(Player player, int levelNumber, MainPanel mainFrameRef, int slotNumber) {
         this.currentPlayer = player;
         this.currentLevelNumber = levelNumber;
         this.mainFrame = mainFrameRef;
-        this.customersServedCount = 0; 
+        this.gameSlotNumber = slotNumber; 
 
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(970, 570));
@@ -122,22 +125,7 @@ public class GamePanel extends JPanel {
             layeredPane.add(errorLabel, Integer.valueOf(0));
         }
 
-        if (this.currentPlayer.getUpgradeLevels() == null) {
-             this.currentPlayer.initializeUpgradeLevels();
-        }
-        List<MenuItem> unlockedItems = MenuUnlock.getUnlockedItems(this.currentLevelNumber, this.currentPlayer);
-        List<Customer> generatedCustomers = CustomerFactory.generateCustomersForLevel(this.currentLevelNumber, unlockedItems);
-        this.customerQueue = new LinkedList<>(generatedCustomers); 
-        this.totalCustomersForLevel = generatedCustomers.size(); 
-        System.out.println("Generated " + generatedCustomers.size() + " customers for level " + this.currentLevelNumber + ". Queue size: " + customerQueue.size());
-
-        BoosterTier booster = BoosterManager.getBoosterForLevel(this.currentLevelNumber);
-        int goal = CustomerOrderManager.getGoalForLevel(this.currentLevelNumber); 
-        int duration = CustomerOrderManager.getDurationForLevel(this.currentLevelNumber);
-        System.out.println("Level " + this.currentLevelNumber + " - Target Gold: " + goal + ", Duration: " + duration + "s");
-
-        this.activeLevel = new Level(this.currentLevelNumber, goal, duration, unlockedItems, new ArrayList<>(customerQueue), booster);
-        this.ovenLogic = this.activeLevel.getOvens();
+        initializeLevelData(); // Panggil metode untuk inisialisasi data level
 
         setupTopInfoUI(); 
         setupOvenUI();
@@ -145,33 +133,64 @@ public class GamePanel extends JPanel {
         setupToppingSauceSourcesUI(); 
         setupPauseButton();
         setupCustomerDisplaySlots(); 
-        fillCustomerSlotsFromQueue(); // Panggil sekali di awal untuk mengisi slot jika ada customer
+        fillCustomerSlotsFromQueue(); 
 
-        updateTimer = new Timer(1000, new ActionListener() { 
-            public void actionPerformed(ActionEvent e) {
-                updateOvenStatusVisuals();
-                updatePiringVisuals();
-                updateActiveCustomerPatience();
-                fillCustomerSlotsFromQueue(); // Coba isi slot kosong secara bertahap
-                updateTopInfoUILabels(); 
-            }
-        });
-        updateTimer.start();
+        // Timer dipindahkan ke startGameTimers() yang dipanggil oleh addNotify atau restartLevel
+        // updateTimer = new Timer(...);
+        // updateTimer.start();
 
         layeredPane.revalidate();
         layeredPane.repaint();
     }
 
+    private void initializeLevelData() {
+        this.gameEnded = false;
+        this.isPaused = false;
+        this.timerStarted = false; // Akan di-set true oleh startGameTimers
+        this.arrKentang = new Potato[]{new EmptyPotato(), new EmptyPotato(), new EmptyPotato(), new EmptyPotato()};
+
+
+        if (this.currentPlayer.getUpgradeLevels() == null) {
+             this.currentPlayer.initializeUpgradeLevels();
+        }
+        List<MenuItem> unlockedItems = MenuUnlock.getUnlockedItems(this.currentLevelNumber, this.currentPlayer);
+        List<Customer> generatedCustomers = CustomerFactory.generateCustomersForLevel(this.currentLevelNumber, unlockedItems);
+        this.customerQueue = new LinkedList<>(generatedCustomers); 
+        this.totalCustomersForLevel = generatedCustomers.size(); 
+        this.customersLeftInLevel = this.totalCustomersForLevel; 
+        System.out.println("Initialized level data. Generated " + generatedCustomers.size() + " customers for level " + this.currentLevelNumber + ". Queue size: " + customerQueue.size());
+
+        BoosterTier booster = BoosterManager.getBoosterForLevel(this.currentLevelNumber);
+        int goal = CustomerOrderManager.getGoalForLevel(this.currentLevelNumber); 
+        int duration = CustomerOrderManager.getDurationForLevel(this.currentLevelNumber);
+        System.out.println("Level " + this.currentLevelNumber + " - Target Gold: " + goal + ", Duration: " + duration + "s");
+
+        this.activeLevel = new Level(this.currentLevelNumber, goal, duration, unlockedItems, new ArrayList<>(customerQueue), booster);
+        this.ovenLogic = this.activeLevel.getOvens(); // Oven di-reset di sini
+
+        // Reset visual customer slots
+        if (activeCustomersInSlots != null) {
+            Arrays.fill(activeCustomersInSlots, null);
+            if (customerSlotPanels != null) { // Pastikan sudah di-setup
+                 for(int i=0; i < MAX_VISIBLE_CUSTOMERS; i++) {
+                    updateCustomerSlotVisual(i); // Kosongkan tampilan slot
+                }
+            }
+        }
+        updateTopInfoUILabels();
+        updatePiringVisuals();
+    }
+
+
     private void setupTopInfoUI() {
         JPanel topInfoPanel = new JPanel(null); 
-        int panelWidth = 250; // Lebar panel info disesuaikan agar lebih pas dengan isi
-        int panelHeight = 50; // Tinggi panel info disesuaikan
-        // Posisi tengah horizontal dan Y dinaikkan (lebih ke atas)
-        topInfoPanel.setBounds((getWidth() > 0 ? (getWidth() - panelWidth) / 2 : (970 - panelWidth) / 2), 25, panelWidth, panelHeight); 
-        topInfoPanel.setOpaque(false); // Panel utama transparan
+        int panelWidth = 220; 
+        int panelHeight = 40; 
+        topInfoPanel.setBounds((getWidth() > 0 ? (getWidth() - panelWidth) / 2 : (970 - panelWidth) / 2), 20, panelWidth, panelHeight); 
+        topInfoPanel.setOpaque(false); 
         
         URL boardUrl = getClass().getResource("/assets/info_board.png"); 
-        JLabel boardBgLabel = null; // Deklarasi di luar if
+        JLabel boardBgLabel = null; 
         if (boardUrl != null) {
             ImageIcon boardIcon = new ImageIcon(boardUrl);
             Image scaledBoardImage = boardIcon.getImage().getScaledInstance(panelWidth, panelHeight, Image.SCALE_SMOOTH);
@@ -179,18 +198,17 @@ public class GamePanel extends JPanel {
             boardBgLabel.setBounds(0, 0, panelWidth, panelHeight); 
             topInfoPanel.add(boardBgLabel); 
         } else {
-            System.err.println("Info board image not found: /assets/info_board.png. Using fallback (no border, transparent).");
-            // Jika tidak ada gambar papan, panel utama tetap transparan dan tidak ada border fallback
-             topInfoPanel.setBackground(new Color(0,0,0,0)); // Sepenuhnya transparan
+            System.err.println("Info board image not found: /assets/info_board.png. Panel akan transparan tanpa border.");
+            topInfoPanel.setBackground(new Color(0,0,0,0)); 
         }
 
-        // Panel konten untuk ikon dan teks, agar selalu di atas gambar papan jika ada
         JPanel contentPanel = new JPanel(null);
         contentPanel.setBounds(0, 0, panelWidth, panelHeight);
         contentPanel.setOpaque(false); 
 
-        int iconSize = 24; // Ukuran ikon sedikit lebih kecil
-        int textOffsetY = (panelHeight - iconSize) / 2; // Untuk vertical centering
+        int iconSize = 22; 
+        int textOffsetY = (panelHeight - iconSize) / 2; 
+        int currentX = 10; 
 
         JLabel customerIconLabel = new JLabel();
         URL customerIconUrl = getClass().getResource("/assets/customer_icon.png"); 
@@ -199,17 +217,18 @@ public class GamePanel extends JPanel {
             Image scaledCustIcon = custOrigIcon.getImage().getScaledInstance(iconSize, iconSize, Image.SCALE_SMOOTH);
             customerIconLabel.setIcon(new ImageIcon(scaledCustIcon));
         } else {
-            // Tidak ada teks fallback jika ikon tidak ada, hanya angka
             System.err.println("Customer icon not found for top info UI.");
         }
-        customerIconLabel.setBounds(10, textOffsetY, iconSize, iconSize); 
+        customerIconLabel.setBounds(currentX, textOffsetY, iconSize, iconSize); 
         contentPanel.add(customerIconLabel);
+        currentX += iconSize + 5; 
 
-        customersRemainingLabel = new JLabel("0/0", SwingConstants.LEFT);
-        customersRemainingLabel.setFont(new Font("Arial", Font.BOLD, 16)); 
-        customersRemainingLabel.setForeground(Color.DARK_GRAY); 
-        customersRemainingLabel.setBounds(10 + iconSize + 5, textOffsetY, 70, iconSize); // Disesuaikan
-        contentPanel.add(customersRemainingLabel);
+        customersInfoLabel = new JLabel("0", SwingConstants.LEFT); 
+        customersInfoLabel.setFont(new Font("Arial", Font.BOLD, 18)); 
+        customersInfoLabel.setForeground(Color.DARK_GRAY); 
+        customersInfoLabel.setBounds(currentX, textOffsetY, 60, iconSize); 
+        contentPanel.add(customersInfoLabel);
+        currentX += 60 + 15; 
 
         JLabel goldIconLabel = new JLabel();
         URL goldIconUrl = getClass().getResource("/assets/gold_coin_icon.png"); 
@@ -220,33 +239,32 @@ public class GamePanel extends JPanel {
         } else {
             System.err.println("Gold icon not found for top info UI.");
         }
-        // Posisikan gold di sebelah kanan customer info
-        goldIconLabel.setBounds(10 + iconSize + 5 + 70 + 10, textOffsetY, iconSize, iconSize); 
+        goldIconLabel.setBounds(currentX, textOffsetY, iconSize, iconSize); 
         contentPanel.add(goldIconLabel);
+        currentX += iconSize + 5; 
 
-        goldLabel = new JLabel("0", SwingConstants.LEFT);
-        goldLabel.setFont(new Font("Arial", Font.BOLD, 16)); 
-        goldLabel.setForeground(Color.DARK_GRAY); 
-        goldLabel.setBounds(10 + iconSize + 5 + 70 + 10 + iconSize + 5, textOffsetY, 80, iconSize); // Disesuaikan
-        contentPanel.add(goldLabel);
+        goldInfoLabel = new JLabel("0", SwingConstants.LEFT); 
+        goldInfoLabel.setFont(new Font("Arial", Font.BOLD, 18)); 
+        goldInfoLabel.setForeground(Color.DARK_GRAY); 
+        goldInfoLabel.setBounds(currentX, textOffsetY, 80, iconSize); 
+        contentPanel.add(goldInfoLabel);
         
-        // Tambahkan contentPanel ke topInfoPanel. Jika ada boardBgLabel, contentPanel akan di atasnya.
         if (boardBgLabel != null) {
-             topInfoPanel.add(contentPanel, 0); // Tambahkan contentPanel di layer 0 dari topInfoPanel (di atas boardBgLabel)
+             topInfoPanel.add(contentPanel, 0); 
         } else {
-            topInfoPanel.add(contentPanel); // Jika tidak ada board, langsung tambahkan contentPanel
+            topInfoPanel.add(contentPanel); 
         }
         
-        layeredPane.add(topInfoPanel, Integer.valueOf(JLayeredPane.PALETTE_LAYER + 10)); // Layer tinggi agar di atas semua
+        layeredPane.add(topInfoPanel, Integer.valueOf(JLayeredPane.PALETTE_LAYER + 10)); 
         updateTopInfoUILabels(); 
     }
 
     private void updateTopInfoUILabels() {
-        if (customersRemainingLabel != null) {
-            customersRemainingLabel.setText((totalCustomersForLevel - customersServedCount) + "/" + totalCustomersForLevel);
+        if (customersInfoLabel != null) {
+            customersInfoLabel.setText(String.valueOf(customersLeftInLevel)); 
         }
-        if (goldLabel != null && currentPlayer != null) {
-            goldLabel.setText(String.valueOf(currentPlayer.getGold()));
+        if (goldInfoLabel != null && currentPlayer != null) {
+            goldInfoLabel.setText(String.valueOf(currentPlayer.getGold()));
         }
     }
 
@@ -269,13 +287,14 @@ public class GamePanel extends JPanel {
                 ovenNameLabels[i] = new JLabel(currentOvenName, SwingConstants.CENTER);
                 ovenNameLabels[i].setForeground(Color.WHITE);
                 ovenNameLabels[i].setFont(new Font("Arial", Font.BOLD, 12)); 
-                ovenNameLabels[i].setBounds(x + i * 125, y - 20, 100, 20); 
+                ovenNameLabels[i].setBounds(x + i * 125, y - 18, 100, 20); // Sedikit diturunkan dari y - 20
                 layeredPane.add(ovenNameLabels[i], Integer.valueOf(3)); 
 
                 final int ovenIndex = i;
                 ovenLabels[i].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        if(gameEnded || isPaused) return; // Tambahkan check isPaused
                         handleOvenClick(ovenIndex);
                     }
                 });
@@ -339,6 +358,7 @@ public class GamePanel extends JPanel {
                 piringLabels[i].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        if(gameEnded || isPaused) return; // Tambahkan check isPaused
                         if (SwingUtilities.isRightMouseButton(e)) { 
                             arrKentang[piringIndex] = new EmptyPotato();
                             updatePiringVisuals(); 
@@ -354,32 +374,45 @@ public class GamePanel extends JPanel {
     }
 
     private void tryServePotatoToCustomer(int piringIndex) {
-        if (arrKentang[piringIndex] instanceof EmptyPotato) {
+        if (gameEnded || isPaused || arrKentang[piringIndex] instanceof EmptyPotato) {
             return;
         }
 
         Potato servedPotato = arrKentang[piringIndex];
+        int bestMatchSlot = -1;
+        int lowestPatience = Integer.MAX_VALUE;
+
         for (int i = 0; i < MAX_VISIBLE_CUSTOMERS; i++) {
             if (activeCustomersInSlots[i] != null) {
                 Customer targetCustomer = activeCustomersInSlots[i];
-                boolean isMatch = checkOrderMatch(servedPotato, targetCustomer);
-
-                if (isMatch) {
-                    JOptionPane.showMessageDialog(this, "Pesanan untuk Customer ("+ targetCustomer.getCustomerImageID() +") cocok!");
-                    currentPlayer.addGold(10); 
-                    customersServedCount++; 
-                    System.out.println("Player gold: " + currentPlayer.getGold() + ", Customers Served: " + customersServedCount);
-                    
-                    activeCustomersInSlots[i] = null; 
-                    updateCustomerSlotVisual(i); 
-                    arrKentang[piringIndex] = new EmptyPotato(); 
-                    updatePiringVisuals();
-                    // fillCustomerSlotsFromQueue(); // Tidak langsung isi, biarkan updateTimer yang mengisi bertahap
-                    updateTopInfoUILabels(); 
-                    return; 
+                if (checkOrderMatch(servedPotato, targetCustomer)) {
+                    if (targetCustomer.getPatienceTime() < lowestPatience) {
+                        lowestPatience = targetCustomer.getPatienceTime();
+                        bestMatchSlot = i;
+                    }
                 }
             }
         }
+
+        if (bestMatchSlot != -1) {
+            Customer customerToServe = activeCustomersInSlots[bestMatchSlot];
+            JOptionPane.showMessageDialog(this, "Pesanan untuk Customer ("+ customerToServe.getCustomerImageID() +") cocok!");
+            currentPlayer.addGold(10); 
+            customersLeftInLevel--; 
+            System.out.println("Player gold: " + currentPlayer.getGold() + ", Customers Left: " + customersLeftInLevel);
+            
+            activeCustomersInSlots[bestMatchSlot] = null; 
+            updateCustomerSlotVisual(bestMatchSlot); 
+            arrKentang[piringIndex] = new EmptyPotato(); 
+            updatePiringVisuals();
+            updateTopInfoUILabels(); 
+            
+            if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
+                endGame(true); 
+            }
+            return; 
+        }
+        
         JOptionPane.showMessageDialog(this, "Tidak ada customer yang cocok dengan kentang ini.");
     }
 
@@ -395,8 +428,6 @@ public class GamePanel extends JPanel {
         String customerExpectedPotatoCleanName = normalizeItemName(customer.getPotato().getNama());
 
         if (!servedPotatoCleanName.equalsIgnoreCase(customerExpectedPotatoCleanName)) {
-            System.out.println("Match fail: Potato type. Served: " + servedPotato.getNama() + " (Clean: " + servedPotatoCleanName + 
-                               "), Expected: " + customer.getPotato().getNama() + " (Clean: " + customerExpectedPotatoCleanName + ")");
             return false;
         }
 
@@ -417,31 +448,17 @@ public class GamePanel extends JPanel {
         boolean toppingMatch = true;
         if (expectedToppingNameNormalized != null) {
             toppingMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedToppingNameNormalized));
-            if (!toppingMatch) {
-                System.out.println("Match fail: Expected topping '" + expectedToppingNameNormalized + "' not found on plate. Plate has: " + itemsOnPlateNormalized);
-                return false;
-            }
+            if (!toppingMatch) return false;
         }
 
         boolean sauceMatch = true;
         if (expectedSauceNameNormalized != null) {
             sauceMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedSauceNameNormalized));
-            if (!sauceMatch) {
-                System.out.println("Match fail: Expected sauce '" + expectedSauceNameNormalized + "' not found on plate. Plate has: " + itemsOnPlateNormalized);
-                return false;
-            }
+            if (!sauceMatch) return false;
         }
         
-        if (itemsOnPlateNormalized.size() != expectedAdditionalItemsCount) {
-            System.out.println("Match fail: Item count mismatch. Expected " + expectedAdditionalItemsCount + " additional items. Plate has " + itemsOnPlateNormalized.size() + " items: " + itemsOnPlateNormalized);
-            System.out.println("Expected Topping: " + expectedToppingNameNormalized + ", Expected Sauce: " + expectedSauceNameNormalized);
-            return false;
-        }
+        if (itemsOnPlateNormalized.size() != expectedAdditionalItemsCount) return false;
         
-        System.out.println("Order MATCH! Served: " + servedPotato.getNama() + " with " + itemsOnPlateNormalized +
-                           ". Customer wanted: " + customer.getPotato().getNama() +
-                           (expectedToppingNameNormalized != null ? " + " + expectedToppingNameNormalized : "") +
-                           (expectedSauceNameNormalized != null ? " + " + expectedSauceNameNormalized : ""));
         return true; 
     }
 
@@ -460,6 +477,7 @@ public class GamePanel extends JPanel {
                 itemLabel.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        if(gameEnded || isPaused) return; // Tambahkan check isPaused
                         for (int j = 0; j < arrKentang.length; j++) {
                             if (arrKentang[j] instanceof RegularPotato) {
                                 RegularPotato rp = (RegularPotato) arrKentang[j];
@@ -487,23 +505,88 @@ public class GamePanel extends JPanel {
             pauseButton.setContentAreaFilled(false);
             pauseButton.setBorderPainted(false);
             pauseButton.setFocusPainted(false);
-            layeredPane.add(pauseButton, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1)); // Layer tinggi
+            layeredPane.add(pauseButton, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1)); 
 
             pauseButton.addActionListener(e -> {
-                if (gameTimer != null && gameTimer.isRunning()) {
-                    gameTimer.stop();
-                    if (updateTimer != null) updateTimer.stop();
-                    JOptionPane.showMessageDialog(GamePanel.this, "Game dijeda. Klik OK untuk melanjutkan.");
-                    gameTimer.start();
-                    if (updateTimer != null) updateTimer.start();
-                } else {
-                     JOptionPane.showMessageDialog(GamePanel.this, "Game sudah dijeda atau belum mulai.");
-                }
+                if(gameEnded) return;
+                handlePauseAction();
             });
         } else {
             System.err.println("Pause button image not found: " + pauseImagePath);
         }
     }
+
+    private void handlePauseAction() {
+        isPaused = true;
+        if (gameTimer != null) gameTimer.stop();
+        if (updateTimer != null) updateTimer.stop();
+
+        String[] options = {"Continue", "Restart Level", "Back to Menu"};
+        int choice = JOptionPane.showOptionDialog(
+            GamePanel.this,
+            "Game Paused",
+            "Pause Menu",
+            JOptionPane.YES_NO_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null, 
+            options,
+            options[0] 
+        );
+
+        isPaused = false; // Reset pause flag setelah dialog ditutup
+
+        switch (choice) {
+            case 0: // Continue
+                if (!gameEnded) { // Hanya resume jika game belum berakhir
+                    if (gameTimer != null) gameTimer.start();
+                    if (updateTimer != null) updateTimer.start();
+                }
+                break;
+            case 1: // Restart Level
+                restartLevel();
+                break;
+            case 2: // Back to Menu
+                goBackToSlots();
+                break;
+            case JOptionPane.CLOSED_OPTION: // User menutup dialog (dianggap continue)
+                 if (!gameEnded) {
+                    if (gameTimer != null) gameTimer.start();
+                    if (updateTimer != null) updateTimer.start();
+                }
+                break;
+        }
+    }
+
+    private void restartLevel() {
+        System.out.println("Restarting level " + currentLevelNumber);
+        // Hentikan timer yang mungkin masih ada
+        if (gameTimer != null) gameTimer.stop();
+        if (updateTimer != null) updateTimer.stop();
+
+        initializeLevelData(); // Re-inisialisasi semua data level dan UI dasar
+
+        // Setup ulang UI spesifik game yang mungkin berubah
+        setupOvenUI(); // Untuk memastikan nama oven benar jika ada perubahan
+        setupPiringUI();
+        // setupToppingSauceSourcesUI(); // Biasanya tidak perlu di-reset
+        // setupPauseButton(); // Tidak perlu di-reset
+        setupCustomerDisplaySlots(); // Setup ulang slot customer
+        fillCustomerSlotsFromQueue(); // Isi customer awal
+
+        startGameTimers(); // Mulai timer lagi
+        layeredPane.revalidate();
+        layeredPane.repaint();
+    }
+
+    private void goBackToSlots() {
+        gameEnded = true;
+        if (gameTimer != null) gameTimer.stop();
+        if (updateTimer != null) updateTimer.stop();
+        if (mainFrame != null) {
+            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
+        }
+    }
+
 
     private void setupCustomerDisplaySlots() {
         activeCustomersInSlots = new Customer[MAX_VISIBLE_CUSTOMERS];
@@ -541,27 +624,29 @@ public class GamePanel extends JPanel {
                 }
             };
             customerOrderLabels[i].setBounds(ORDER_BUBBLE_X_OFFSET, ORDER_BUBBLE_Y, ORDER_BUBBLE_WIDTH, ORDER_BUBBLE_HEIGHT);
-            customerOrderLabels[i].setFont(new Font("Arial", Font.PLAIN, 10)); 
+            customerOrderLabels[i].setFont(new Font("Arial", Font.PLAIN, 13)); 
             customerOrderLabels[i].setVerticalAlignment(SwingConstants.TOP);
             customerOrderLabels[i].setForeground(Color.BLACK);
             customerSlotPanels[i].add(customerOrderLabels[i]);
             
-            layeredPane.add(customerSlotPanels[i], Integer.valueOf(JLayeredPane.PALETTE_LAYER + 5)); // Layer di atas info panel
+            layeredPane.add(customerSlotPanels[i], Integer.valueOf(JLayeredPane.PALETTE_LAYER + 5)); 
             updateCustomerSlotVisual(i); 
         }
     }
     
     private void fillCustomerSlotsFromQueue() {
+        if(gameEnded || isPaused) return; // Tambahkan check isPaused
         for (int i = 0; i < MAX_VISIBLE_CUSTOMERS; i++) {
             if (activeCustomersInSlots[i] == null) { 
                 if (!customerQueue.isEmpty()) {
                     activeCustomersInSlots[i] = customerQueue.poll(); 
                     System.out.println("Customer " + activeCustomersInSlots[i].getCustomerImageID() + " masuk ke slot " + i);
                     updateCustomerSlotVisual(i);
-                    return; // Hanya isi satu slot per panggilan untuk kedatangan bertahap
+                    return; 
                 } else {
-                    // Tidak ada customer lagi di antrian, pastikan slot visual kosong
-                    updateCustomerSlotVisual(i); 
+                    if (activeCustomersInSlots[i] == null) { 
+                        updateCustomerSlotVisual(i); 
+                    }
                 }
             }
         }
@@ -589,18 +674,18 @@ public class GamePanel extends JPanel {
 
                 if (originalWidth > CUSTOMER_IMAGE_SIZE || originalHeight > CUSTOMER_IMAGE_SIZE) {
                     float aspectRatio = (float) originalWidth / (float) originalHeight;
-                    if (originalWidth > originalHeight) {
+                    if (originalWidth > originalHeight) { 
                         newWidth = CUSTOMER_IMAGE_SIZE;
                         newHeight = (int) (newWidth / aspectRatio);
-                    } else {
+                    } else { 
                         newHeight = CUSTOMER_IMAGE_SIZE;
                         newWidth = (int) (newHeight * aspectRatio);
                     }
-                    if (newWidth > CUSTOMER_IMAGE_SIZE) { // Double check
+                    if (newWidth > CUSTOMER_IMAGE_SIZE) { 
                         newWidth = CUSTOMER_IMAGE_SIZE;
                         newHeight = (int) (newWidth / aspectRatio);
                     }
-                    if (newHeight > CUSTOMER_IMAGE_SIZE) { // Double check
+                    if (newHeight > CUSTOMER_IMAGE_SIZE) { 
                          newHeight = CUSTOMER_IMAGE_SIZE;
                          newWidth = (int) (newHeight * aspectRatio);
                     }
@@ -637,23 +722,80 @@ public class GamePanel extends JPanel {
         }
     }
 
-    private void updateActiveCustomerPatience() {
+    private void updateActiveCustomerPatienceAndHandleDeparture() { 
+        if(gameEnded || isPaused) return; // Tambahkan check isPaused
         boolean customerChanged = false;
         for (int i = 0; i < MAX_VISIBLE_CUSTOMERS; i++) {
             if (activeCustomersInSlots[i] != null) {
                 activeCustomersInSlots[i].decreasePatience(1); 
                 if (activeCustomersInSlots[i].isAngry()) {
                     System.out.println("Customer " + activeCustomersInSlots[i].getCustomerImageID() + " di slot " + i + " marah dan pergi!");
+                    currentPlayer.addGold(-10); 
+                    if(currentPlayer.getGold() < 0) currentPlayer.setGold(0); 
+                    
+                    customersLeftInLevel--; 
+                    
                     activeCustomersInSlots[i] = null; 
                     customerChanged = true; 
+                    updateTopInfoUILabels(); 
+                    if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
+                         endGame(false); 
+                         return; 
+                    }
                 }
                 updateCustomerSlotVisual(i); 
             }
         }
-        // if (customerChanged) { // Tidak perlu panggil fill dari sini jika updateTimer sudah memanggilnya
-        //     fillCustomerSlotsFromQueue(); 
-        // }
     }
+
+    private boolean anyActiveCustomers() {
+        for (Customer cust : activeCustomersInSlots) {
+            if (cust != null) return true;
+        }
+        return false;
+    }
+
+    private void endGame(boolean allServedSuccessfully) {
+        if (gameEnded) return; 
+        gameEnded = true;
+        isPaused = false; // Pastikan status pause juga direset
+
+        if (gameTimer != null) gameTimer.stop();
+        if (updateTimer != null) updateTimer.stop();
+
+        String message;
+        int nextLevelToSave = currentLevelNumber; 
+
+        if (allServedSuccessfully) {
+            message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
+            if (currentLevelNumber < 10) { 
+                nextLevelToSave = currentLevelNumber + 1;
+            }
+        } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
+            message = "Level " + currentLevelNumber + " Selesai. Semua customer telah pergi.";
+        } else { 
+            message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
+        }
+        JOptionPane.showMessageDialog(GamePanel.this, message);
+        
+        SaveSlotData updatedSlotData = new SaveSlotData(
+            currentPlayer.getUsername(), 
+            nextLevelToSave, 
+            currentPlayer.getTotalStars() 
+        );
+        
+        SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData); 
+        System.out.println("Progress saved to slot " + this.gameSlotNumber + 
+                           ": Player=" + currentPlayer.getUsername() + 
+                           ", Level to save=" + nextLevelToSave + 
+                           ", Stars=" + currentPlayer.getTotalStars());
+
+
+        if (mainFrame != null) {
+            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
+        }
+    }
+
 
     private void updateOvenStatusVisuals() {
         if (this.ovenLogic == null) return;
@@ -696,32 +838,67 @@ public class GamePanel extends JPanel {
                 return new EmptyPotato();
         }
     }
+    
+    private void startGameTimers() {
+        if (gameEnded || timerStarted) { 
+            if(timerStarted && gameTimer != null && gameTimer.isRunning()){
+                // Sudah berjalan, tidak perlu start ulang kecuali ini restart
+            } else if (gameEnded) {
+                return;
+            }
+        }
 
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        if (!timerStarted && this.activeLevel != null) {
-            timerStarted = true;
+        if (gameTimer != null && gameTimer.isRunning()) gameTimer.stop();
+        if (updateTimer != null && updateTimer.isRunning()) updateTimer.stop();
+
+        timerStarted = true; 
+
+        if (this.activeLevel != null) {
             final int totalSeconds = this.activeLevel.getDuration();
-            final int[] timeLeft = {totalSeconds};
-            System.out.println("Game timer starting for level " + this.activeLevel.getLevelNumber() + " with duration: " + totalSeconds + "s");
+            final int[] timeLeft = {totalSeconds}; 
 
             gameTimer = new Timer(1000, new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
+                    if (gameEnded || isPaused) { // Tambahkan check isPaused
+                        // ((Timer) e.getSource()).stop(); // Jangan stop permanen jika hanya pause
+                        return;
+                    }
                     timeLeft[0]--;
                     if (timeLeft[0] <= 0) {
-                        ((Timer)e.getSource()).stop();
-                        if(updateTimer != null) updateTimer.stop(); 
-                        JOptionPane.showMessageDialog(GamePanel.this, "Waktu habis untuk Level " + activeLevel.getLevelNumber() + "!");
-                        if (mainFrame != null) {
-                            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
-                        }
+                        endGame(false); 
                     }
                 }
             });
             gameTimer.start();
+            System.out.println("Game timer (re)started for level " + this.activeLevel.getLevelNumber() + " with duration: " + totalSeconds + "s");
+        } else {
+            System.err.println("Cannot start game timer: activeLevel is null.");
+        }
+
+        updateTimer = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                if (gameEnded || isPaused) { // Tambahkan check isPaused
+                    // ((Timer) e.getSource()).stop(); // Jangan stop permanen jika hanya pause
+                    return;
+                }
+                updateOvenStatusVisuals();
+                updatePiringVisuals();
+                updateActiveCustomerPatienceAndHandleDeparture();
+                fillCustomerSlotsFromQueue();
+                updateTopInfoUILabels();
+            }
+        });
+        updateTimer.start();
+    }
+
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        if (!timerStarted && !gameEnded && this.activeLevel != null) { 
+            startGameTimers();
         } else if (this.activeLevel == null) {
-            System.err.println("addNotify called but activeLevel is null. Timer not started.");
+            System.err.println("addNotify called but activeLevel is null. Timers not started.");
         }
     }
 }
