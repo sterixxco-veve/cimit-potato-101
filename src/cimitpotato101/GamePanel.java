@@ -50,7 +50,7 @@ public class GamePanel extends JPanel {
     private JLabel[] piringLabels = new JLabel[4];
     private Potato[] arrKentang = {new EmptyPotato(), new EmptyPotato(), new EmptyPotato(), new EmptyPotato()};
     private int[][] koordinatToppingSources = {{100,330}, {235,335}, {130,280}, {720,340}, {820, 340}};
-
+    private ArrayList<Topping> availableToppings = new ArrayList<>();
 
     private Timer gameTimer; 
     private Timer updateTimer; 
@@ -138,6 +138,7 @@ public class GamePanel extends JPanel {
         // Timer dipindahkan ke startGameTimers() yang dipanggil oleh addNotify atau restartLevel
         // updateTimer = new Timer(...);
         // updateTimer.start();
+        initAvailableToppings();
 
         layeredPane.revalidate();
         layeredPane.repaint();
@@ -461,39 +462,65 @@ public class GamePanel extends JPanel {
         
         return true; 
     }
+    
+    private void initAvailableToppings() {
+        availableToppings.add(new Topping("bacon", 2000, "topping", 1, "/assets/bacon.png"));
+        availableToppings.add(new Topping("cheese", 1500, "topping", 1, "/assets/cheese.png"));
+        availableToppings.add(new Topping("pepperoni", 1800, "topping", 1, "/assets/pepperoni.png"));
+        availableToppings.add(new Topping("mayo", 1000, "sauce", 1, "/assets/mayo.png"));
+        availableToppings.add(new Topping("tomato", 1000, "sauce", 1, "/assets/tomato.png"));
+    }
+
 
     private void setupToppingSauceSourcesUI() {
-        String[] itemAssetNames = {"bacon", "cheese", "pepperoni", "mayo", "tomato"}; 
-        for (int i = 0; i < itemAssetNames.length ; i++) {
-            String itemPath = "/assets/" + itemAssetNames[i] + ".png"; 
-            URL itemUrl = getClass().getResource(itemPath);
-            if (itemUrl != null) {
-                ImageIcon itemIcon = new ImageIcon(itemUrl);
-                JLabel itemLabel = new JLabel(itemIcon);
-                itemLabel.setBounds(koordinatToppingSources[i][0], koordinatToppingSources[i][1], 80, 80); 
-                layeredPane.add(itemLabel, Integer.valueOf(3));
+    String[] itemAssetNames = {"bacon", "cheese", "pepperoni", "mayo", "tomato"}; 
+    for (int i = 0; i < itemAssetNames.length ; i++) {
+        String itemPath = "/assets/" + itemAssetNames[i] + ".png"; 
+        URL itemUrl = getClass().getResource(itemPath);
+        if (itemUrl != null) {
+            ImageIcon itemIcon = new ImageIcon(itemUrl);
+            JLabel itemLabel = new JLabel(itemIcon);
+            itemLabel.setBounds(koordinatToppingSources[i][0], koordinatToppingSources[i][1], 80, 80); 
+            layeredPane.add(itemLabel, Integer.valueOf(3));
 
-                final String itemNameForLogic = itemAssetNames[i]; 
-                itemLabel.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        if(gameEnded || isPaused) return; // Tambahkan check isPaused
-                        for (int j = 0; j < arrKentang.length; j++) {
-                            if (arrKentang[j] instanceof RegularPotato) {
-                                RegularPotato rp = (RegularPotato) arrKentang[j];
-                                rp.addTopping(itemNameForLogic); 
-                                System.out.println("Added " + itemNameForLogic + " to Regular Potato on piring " + j + ". Current toppings: " + rp.getToppings());
-                                updatePiringVisuals(); 
-                                break; 
+            final String itemNameForLogic = itemAssetNames[i]; 
+            itemLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if (gameEnded || isPaused) return;
+                    for (int j = 0; j < arrKentang.length; j++) {
+                        if (arrKentang[j] instanceof RegularPotato) {
+                            RegularPotato rp = (RegularPotato) arrKentang[j];
+                            boolean success=false;
+                            for (Topping t : availableToppings) {
+                                if (t.getNama().equalsIgnoreCase(itemNameForLogic)) {
+                                    if(rp.addTopping(t)){
+                                        System.out.println("--");
+                                        System.out.println("Added " + itemNameForLogic + " to Regular Potato on piring " + j + ". Current toppings: " + rp.getToppings());
+                                        success=true;
+                                        break;
+                                    } else{
+                                        System.out.println("---");
+                                    }
+                                }
                             }
+                            if(success){
+                               updatePiringVisuals(); 
+                               break; 
+                            }
+                            
+
+                            
                         }
                     }
-                });
-            } else {
-                System.err.println("Item (Topping/Sauce) image not found: " + itemPath);
-            }
+                }
+            });
+        } else {
+            System.err.println("Item (Topping/Sauce) image not found: " + itemPath);
         }
     }
+}
+
     
     private void setupPauseButton() {
         String pauseImagePath = "/assets/pauseButton.png";
