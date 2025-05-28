@@ -55,7 +55,7 @@ public class MainPanel extends JFrame {
         int levelToPlay = slotData.getLevel(); 
 
         // 3. Buat instance GamePanel baru dengan data pemain, level, MainPanel, dan slotNumber
-        GamePanel newGamePanel = new GamePanel(gamePlayer, levelToPlay, this, slotNumber);
+        GamePanel newGamePanel = new GamePanel(gamePlayer, 10, this, slotNumber);
 
         // 4. Ganti panel game yang ada di CardLayout dan tampilkan
         String gamePanelId = "game_instance_" + System.currentTimeMillis(); 

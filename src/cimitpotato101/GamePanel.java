@@ -424,41 +424,60 @@ public class GamePanel extends JPanel {
 
     private boolean checkOrderMatch(Potato servedPotato, Customer customer) {
         if (customer == null || servedPotato == null || customer.getPotato() == null) return false;
-
         String servedPotatoCleanName = normalizeItemName(servedPotato.getNama());
         String customerExpectedPotatoCleanName = normalizeItemName(customer.getPotato().getNama());
 
         if (!servedPotatoCleanName.equalsIgnoreCase(customerExpectedPotatoCleanName)) {
+            System.out.println("Jenis kentang salah");
             return false;
         }
 
-        List<String> itemsOnPlateNormalized = new ArrayList<>();
-        if (servedPotato instanceof RegularPotato) {
-            for(String item : ((RegularPotato) servedPotato).getToppings()){
-                itemsOnPlateNormalized.add(normalizeItemName(item));
-            }
-        }
+//        List<String> itemsOnPlateNormalized = new ArrayList<>();
+        String toppingKentang = servedPotato.getToppings().size()>0?servedPotato.getToppings().get(0):"";
+        String sausKentang = servedPotato.getSauces().size()>0?servedPotato.getSauces().get(0):"";
 
-        String expectedToppingNameNormalized = (customer.getTopping() != null) ? normalizeItemName(customer.getTopping().getNama()) : null;
-        String expectedSauceNameNormalized = (customer.getSauce() != null) ? normalizeItemName(customer.getSauce().getNama()) : null;
-
-        int expectedAdditionalItemsCount = 0;
-        if (expectedToppingNameNormalized != null) expectedAdditionalItemsCount++;
-        if (expectedSauceNameNormalized != null) expectedAdditionalItemsCount++;
+//            for(String item : servedPotato.getToppings()){
+//                itemsOnPlateNormalized.add(normalizeItemName(item));
+//            }
+//             for(String item : servedPotato.getSauces()){
+//                itemsOnPlateNormalized.add(normalizeItemName(item));
+//            }
         
-        boolean toppingMatch = true;
-        if (expectedToppingNameNormalized != null) {
-            toppingMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedToppingNameNormalized));
-            if (!toppingMatch) return false;
+
+//        String expectedToppingNameNormalized = (customer.getTopping() != null) ? normalizeItemName(customer.getTopping()) : null;
+//        String expectedSauceNameNormalized = (customer.getSauce() != null) ? normalizeItemName(customer.getSauce()) : null;
+
+//        int expectedAdditionalItemsCount = 0;
+//        if (expectedToppingNameNormalized != null) expectedAdditionalItemsCount++;
+//        if (expectedSauceNameNormalized != null) expectedAdditionalItemsCount++;
+        
+//        boolean toppingMatch = true;
+//        if (expectedToppingNameNormalized != null) {
+//            toppingMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedToppingNameNormalized));
+//            if (!toppingMatch) {
+//                System.out.println("Topping salah");
+//                return false;
+//            }
+//        }
+        if(!customer.getTopping().equalsIgnoreCase(toppingKentang)){
+            System.out.println("Topping salah");
+                return false;
+        }
+        if(!customer.getSauce().equalsIgnoreCase(sausKentang)){
+            System.out.println("Saos salah");
+                return false;
         }
 
-        boolean sauceMatch = true;
-        if (expectedSauceNameNormalized != null) {
-            sauceMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedSauceNameNormalized));
-            if (!sauceMatch) return false;
-        }
+//        boolean sauceMatch = true;
+//        if (expectedSauceNameNormalized != null) {
+//            sauceMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedSauceNameNormalized));
+//            if (!sauceMatch){ 
+//                System.out.println("Saos salah");
+//                return false;
+//            }
+//        }
         
-        if (itemsOnPlateNormalized.size() != expectedAdditionalItemsCount) return false;
+//        if (itemsOnPlateNormalized.size() != expectedAdditionalItemsCount) return false;
         
         return true; 
     }
@@ -466,14 +485,14 @@ public class GamePanel extends JPanel {
     private void initAvailableToppings() {
         availableToppings.add(new Topping("bacon", 2000, "topping", 1, "/assets/bacon.png"));
         availableToppings.add(new Topping("cheese", 1500, "topping", 1, "/assets/cheese.png"));
-        availableToppings.add(new Topping("pepperoni", 1800, "topping", 1, "/assets/pepperoni.png"));
+        availableToppings.add(new Topping("pepperoin", 1800, "topping", 1, "/assets/pepperoin.png"));
         availableToppings.add(new Topping("mayo", 1000, "sauce", 1, "/assets/mayo.png"));
         availableToppings.add(new Topping("tomato", 1000, "sauce", 1, "/assets/tomato.png"));
     }
 
 
     private void setupToppingSauceSourcesUI() {
-    String[] itemAssetNames = {"bacon", "cheese", "pepperoni", "mayo", "tomato"}; 
+    String[] itemAssetNames = {"bacon", "cheese", "pepperoin", "mayo", "tomato"}; 
     for (int i = 0; i < itemAssetNames.length ; i++) {
         String itemPath = "/assets/" + itemAssetNames[i] + ".png"; 
         URL itemUrl = getClass().getResource(itemPath);
@@ -489,18 +508,31 @@ public class GamePanel extends JPanel {
                 public void mouseClicked(MouseEvent e) {
                     if (gameEnded || isPaused) return;
                     for (int j = 0; j < arrKentang.length; j++) {
+                        Potato rp = new Potato("", 0, 0, "");
                         if (arrKentang[j] instanceof RegularPotato) {
-                            RegularPotato rp = (RegularPotato) arrKentang[j];
+                            rp = (RegularPotato) arrKentang[j];
+                        }
+                        else if (arrKentang[j] instanceof ChipsPotato) {
+                            rp = (ChipsPotato) arrKentang[j];
+                        }
+                        else if (arrKentang[j] instanceof CurlyPotato) {
+                            rp = (CurlyPotato) arrKentang[j];
+                        }
+                        else if (arrKentang[j] instanceof WedgesPotato) {
+                            rp = (WedgesPotato) arrKentang[j];
+                        } else if (arrKentang[j] instanceof TornadoPotato) {
+                            rp = (TornadoPotato) arrKentang[j];
+                        } else if (arrKentang[j] instanceof MashedPotato) {
+                            rp = (MashedPotato) arrKentang[j];
+                        }
+                        if(!rp.getNama().equals("")){
                             boolean success=false;
                             for (Topping t : availableToppings) {
                                 if (t.getNama().equalsIgnoreCase(itemNameForLogic)) {
                                     if(rp.addTopping(t)){
-                                        System.out.println("--");
-                                        System.out.println("Added " + itemNameForLogic + " to Regular Potato on piring " + j + ". Current toppings: " + rp.getToppings());
+                                        System.out.println("Added " + itemNameForLogic + " to "+rp.getNama()+" on piring " + j + ". Current toppings: " + rp.getToppings());
                                         success=true;
-                                        break;
-                                    } else{
-                                        System.out.println("---");
+//                                        break;
                                     }
                                 }
                             }
@@ -508,10 +540,7 @@ public class GamePanel extends JPanel {
                                updatePiringVisuals(); 
                                break; 
                             }
-                            
-
-                            
-                        }
+                       }
                     }
                 }
             });
@@ -733,10 +762,10 @@ public class GamePanel extends JPanel {
             orderText.append("<b>").append(potatoName).append("</b><br>");
 
             if (customer.getTopping() != null) {
-                orderText.append("+ ").append(customer.getTopping().getNama()).append("<br>");
+                orderText.append("+ ").append(customer.getTopping()).append("<br>");
             }
             if (customer.getSauce() != null) {
-                orderText.append("+ ").append(customer.getSauce().getNama()).append("<br>");
+                orderText.append("+ ").append(customer.getSauce()).append("<br>");
             }
             orderText.append("<hr style='margin:1px 0;'>Patience: <b>").append(customer.getPatienceTime()).append("</b></html>");
             orderLabel.setText(orderText.toString());
@@ -857,7 +886,7 @@ public class GamePanel extends JPanel {
             case "regular": return new RegularPotato(); 
             case "curly": return new CurlyPotato();
             case "chips": return new ChipsPotato();
-            // case "wedges": return new WedgesPotato(); 
+            case "wedges": return new WedgesPotato(); 
             case "tornado": return new TornadoPotato();
             case "mashed": return new MashedPotato();
             default:

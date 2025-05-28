@@ -71,27 +71,27 @@ public class CustomerOrderManager {
         orderTemplates.put(6, level6Orders);
 
         List<CustomerOrderTemplate> level7Orders = new ArrayList<>();
-        level7Orders.add(new CustomerOrderTemplate("Tornado", "Pepperoni", null, false));
+        level7Orders.add(new CustomerOrderTemplate("Tornado", "Pepperoin", null, false));
         level7Orders.add(new CustomerOrderTemplate("Wedges", "Cheese", null, false));
-        level7Orders.add(new CustomerOrderTemplate("Chips", "Pepperoni", null, true));
+        level7Orders.add(new CustomerOrderTemplate("Chips", "Pepperoin", null, true));
         orderTemplates.put(7, level7Orders);
 
         List<CustomerOrderTemplate> level8Orders = new ArrayList<>();
         level8Orders.add(new CustomerOrderTemplate("Tornado", "Cheese", "Mayo", false));
-        level8Orders.add(new CustomerOrderTemplate("Wedges", "Pepperoni", null, false));
+        level8Orders.add(new CustomerOrderTemplate("Wedges", "Pepperoin", null, false));
         level8Orders.add(new CustomerOrderTemplate("Tornado", null, null, true));
         orderTemplates.put(8, level8Orders);
 
         List<CustomerOrderTemplate> level9Orders = new ArrayList<>();
         level9Orders.add(new CustomerOrderTemplate("Mashed", "Bacon", "Cheese", false));
-        level9Orders.add(new CustomerOrderTemplate("Tornado", "Pepperoni", null, false));
+        level9Orders.add(new CustomerOrderTemplate("Tornado", "Pepperoin", null, false));
         level9Orders.add(new CustomerOrderTemplate("Wedges", "Bacon", null, true));
         orderTemplates.put(9, level9Orders);
 
         List<CustomerOrderTemplate> level10Orders = new ArrayList<>();
         level10Orders.add(new CustomerOrderTemplate("Mashed", "Cheese", null, false));
         level10Orders.add(new CustomerOrderTemplate("Tornado", "Bacon", null, false));
-        level10Orders.add(new CustomerOrderTemplate("Wedges", "Pepperoni", "Mayo", true));
+        level10Orders.add(new CustomerOrderTemplate("Wedges", "Pepperoin", "Mayo", true));
         orderTemplates.put(10, level10Orders);
 
         // Inisialisasi Durasi per Level (dalam detik)

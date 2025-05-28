@@ -34,7 +34,7 @@ public class CustomerFactory {
             MenuItem potato = findPotato(template.getPotato(), unlockedItems);
             if (potato == null) {
                 System.out.println("Fallback: Potato '" + template.getPotato() + "' tidak ditemukan di unlockedItems, mencoba Regular Potato.");
-                potato = findPotato("Regular", unlockedItems); 
+                potato = findPotato("regular", unlockedItems); 
                 if (potato == null) {
                     System.err.println("Fallback gagal: Regular Potato juga tidak ditemukan. Melewati customer ini.");
                     continue; 

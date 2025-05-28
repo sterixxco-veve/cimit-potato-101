@@ -11,6 +11,6 @@ package cimitpotato101;
  */
 public class WedgesPotato extends Potato{
     public WedgesPotato() {
-        super("Wedges Potato", 0, 0, "/assets/potatoWedges.png");
+        super("Wedges", 0, 0, "/assets/potatoWedges.png");
     }
 }

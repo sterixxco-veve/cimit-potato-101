@@ -11,6 +11,6 @@ package cimitpotato101;
  */
 public class MashedPotato extends Potato{
     public MashedPotato() {
-        super("Mashed Potato", 0, 0, "/assets/potatoMashed.png");
+        super("Mashed", 0, 0, "/assets/potatoMashed.png");
     }
 }
