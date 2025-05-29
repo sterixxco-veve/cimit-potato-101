@@ -24,22 +24,25 @@ public class LevelSelectMenu extends JPanel {
         {390, 230}, // Level 6
         {480, 160}, // Level 7
         {390, 140}, // Level 8
-        {460, 90}, // Level 9
-        {390, 40}  // Level 10
+        {460, 90},  // Level 9
+        {390, 40}   // Level 10
     };
 
     private Image background;
     private Image goldSign;
     private Image starSign;
 
+    // Tambahkan field label agar bisa di-refresh
+    private JLabel goldLabel;
+    private JLabel starsLabel;
+
     public LevelSelectMenu(MainPanel mainPanel, Player player, SaveSlotData slotData, int slotNumber) {
         this.mainPanel = mainPanel;
         this.player = player;
         this.slotData = slotData;
         this.slotNumber = slotNumber;
-        System.out.println("test");
 
-        setLayout(null); // pakai absolute layout supaya tombol bisa diatur manual
+        setLayout(null); // absolute layout
 
         loadImages();
         addHUD();
@@ -64,10 +67,10 @@ public class LevelSelectMenu extends JPanel {
     private void addHUD() {
         // GOLD panel kiri atas
         JLabel goldPanel = new JLabel(new ImageIcon(goldSign));
-        goldPanel.setBounds(40, 0, 260, 100); // sesuaikan ukuran panel
+        goldPanel.setBounds(40, 0, 260, 100); // ukuran panel gold
         add(goldPanel);
 
-        JLabel goldLabel = new JLabel(player.getGold() + "", SwingConstants.CENTER);
+        goldLabel = new JLabel(String.valueOf(player.getGold()), SwingConstants.CENTER);
         goldLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 26));
         goldLabel.setForeground(new Color(0, 0, 0));
         goldLabel.setBounds(145, 55, 90, 30); // di atas panel gold
@@ -80,18 +83,17 @@ public class LevelSelectMenu extends JPanel {
         starPanel.setBounds(680, 0, 260, 100);
         add(starPanel);
 
-        JLabel starsLabel = new JLabel(player.getStars() + "", SwingConstants.CENTER);
+        starsLabel = new JLabel(String.valueOf(player.getStars()), SwingConstants.CENTER);
         starsLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 26));
         starsLabel.setForeground(new Color(0, 0, 0));
         starsLabel.setBounds(820, 57, 90, 30);
         add(starsLabel);
-        setComponentZOrder(starsLabel, 0); // goldLabel paling atas
+        setComponentZOrder(starsLabel, 0);
         setComponentZOrder(starPanel, 1);
     }
 
     private void addLevelButtons() {
         int unlockedLevel = player.getCurrentLevel();
-        System.out.println(maxLevel);
         for (int i = 1; i <= maxLevel; i++) {
             int idx = i - 1;
             int x = levelPositions[idx][0];
@@ -105,12 +107,9 @@ public class LevelSelectMenu extends JPanel {
 
     private JButton createLevelButton(int level, boolean unlocked) {
         String imgPath = "/assets/Level" + level + ".png";
-        ImageIcon icon = null;
+        ImageIcon icon;
         try {
             icon = new ImageIcon(getClass().getResource(imgPath));
-//            if (!unlocked) {
-//                icon = new ImageIcon(toGrayScale(icon.getImage()));
-//            }
         } catch (Exception e) {
             icon = new ImageIcon();
         }
@@ -133,21 +132,6 @@ public class LevelSelectMenu extends JPanel {
         return btn;
     }
 
-    // Konversi gambar menjadi grayscale
-    private Image toGrayScale(Image srcImg) {
-        BufferedImage src = new BufferedImage(
-            srcImg.getWidth(null), srcImg.getHeight(null), BufferedImage.TYPE_INT_ARGB
-        );
-        Graphics2D g2 = src.createGraphics();
-        g2.drawImage(srcImg, 0, 0, null);
-        g2.dispose();
-
-        BufferedImageOp op = new ColorConvertOp(
-                ColorSpace.getInstance(ERROR).getInstance(ColorSpace.CS_GRAY), null
-        );
-        return op.filter(src, null);
-    }
-
     private void addBackButton() {
         JButton backBtn = new JButton("Back");
         backBtn.setBounds(40, 500, 100, 40);
@@ -160,6 +144,13 @@ public class LevelSelectMenu extends JPanel {
             mainPanel.getCardLayout().show(mainPanel.getCardPanel(), "slots");
         });
         add(backBtn);
+    }
+
+    // Method untuk refresh label gold & stars setelah selesai main
+    public void refreshHUD() {
+        if (goldLabel != null) goldLabel.setText(String.valueOf(player.getGold()));
+        if (starsLabel != null) starsLabel.setText(String.valueOf(player.getStars()));
+        repaint();
     }
 
     @Override

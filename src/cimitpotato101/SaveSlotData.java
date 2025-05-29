@@ -1,26 +1,37 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cimitpotato101;
-
-/**
- *
- * @author Aspire
- */
 
 import java.io.Serializable;
 
 public class SaveSlotData implements Serializable {
+    private static final long serialVersionUID = 1L; // Tambahkan ini agar serialisasi stabil
+
     private String playerName;
     private int level;
     private int stars;
+    private int gold;
 
+    // Constructor utama
+    public SaveSlotData(String playerName, int level, int stars, int gold) {
+        this.playerName = playerName;
+        this.level = level;
+        this.stars = stars;
+        this.gold = gold;
+    }
+
+    // Constructor alternatif (tanpa gold, default gold=0)
     public SaveSlotData(String playerName, int level, int stars) {
         this.playerName = playerName;
         this.level = level;
         this.stars = stars;
+        this.gold = 0;
+    }
+
+    // Constructor default (jika perlu untuk serialisasi)
+    public SaveSlotData() {
+        this.playerName = "";
+        this.level = 1;
+        this.stars = 0;
+        this.gold = 0;
     }
 
     public String getPlayerName() {
@@ -46,5 +57,12 @@ public class SaveSlotData implements Serializable {
     public void setStars(int stars) {
         this.stars = stars;
     }
-}
 
+    public int getGold() {
+        return gold;
+    }
+
+    public void setGold(int gold) {
+        this.gold = gold;
+    }
+}

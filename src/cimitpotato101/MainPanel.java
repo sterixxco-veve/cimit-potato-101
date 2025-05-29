@@ -57,7 +57,7 @@ public class MainPanel extends JFrame {
         int levelToPlay = slotData.getLevel(); 
 
         // 3. Buat instance GamePanel baru dengan data pemain, level, MainPanel, dan slotNumber
-        GamePanel newGamePanel = new GamePanel(gamePlayer, levelToPlay, this, slotNumber);
+        GamePanel newGamePanel = new GamePanel(gamePlayer, levelToPlay, this, slotNumber, slotData);
 
         // 4. Ganti panel game yang ada di CardLayout dan tampilkan
         String gamePanelId = "game_instance_" + System.currentTimeMillis(); 
@@ -71,7 +71,7 @@ public class MainPanel extends JFrame {
         Player player = new Player(slotData.getPlayerName()); 
         player.setCurrentLevel(slotData.getLevel()); 
         player.setStars(slotData.getStars()); 
-        player.setGold(0); // Set gold awal menjadi 0, atau sesuai logika game Anda
+        player.setGold(slotData.getGold()); // Set gold awal menjadi 0, atau sesuai logika game Anda
         player.initializeUpgradeLevels(); 
 
         // (Opsional) Jika Anda punya sistem save/load Player yang lebih lengkap, integrasikan di sini.
@@ -103,13 +103,11 @@ public class MainPanel extends JFrame {
         return player;
     }
     public void showLevelSelectMenu(Player player, SaveSlotData slotData, int slotNumber) {
-        Player gamePlayer = loadOrCreatePlayer(slotData);
-        
-        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, gamePlayer, slotData, slotNumber);
-        
-        cardPanel.add(levelSelectPanel, "level");
-        
-        cardLayout.show(cardPanel, "level");
-        
-    }
+    // Langsung pakai player yang sudah diupdate (jangan buat baru dari slotData!)
+    LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
+
+    cardPanel.add(levelSelectPanel, "level");
+    cardLayout.show(cardPanel, "level");
+    levelSelectPanel.refreshHUD();
+}
 }

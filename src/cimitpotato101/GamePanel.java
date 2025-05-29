@@ -63,6 +63,7 @@ public class GamePanel extends JPanel {
     private Level activeLevel;
     private MainPanel mainFrame;
     private int gameSlotNumber; 
+    private SaveSlotData slotData;
 
     // Variabel untuk Customer Display
     private Queue<Customer> customerQueue; 
@@ -97,11 +98,12 @@ public class GamePanel extends JPanel {
     private final int MAX_VISIBLE_CUSTOMERS = 3; 
 
 
-    public GamePanel(Player player, int levelNumber, MainPanel mainFrameRef, int slotNumber) {
+    public GamePanel(Player player, int levelNumber, MainPanel mainFrameRef, int slotNumber, SaveSlotData slotData) {
         this.currentPlayer = player;
         this.currentLevelNumber = levelNumber;
         this.mainFrame = mainFrameRef;
         this.gameSlotNumber = slotNumber; 
+        this.slotData = slotData;
 
         setLayout(new BorderLayout());
         setPreferredSize(new Dimension(970, 570));
@@ -820,45 +822,57 @@ public class GamePanel extends JPanel {
     }
 
     private void endGame(boolean allServedSuccessfully) {
-        if (gameEnded) return; 
-        gameEnded = true;
-        isPaused = false; // Pastikan status pause juga direset
+    if (gameEnded) return; 
+    gameEnded = true;
+    isPaused = false;
 
-        if (gameTimer != null) gameTimer.stop();
-        if (updateTimer != null) updateTimer.stop();
+    if (gameTimer != null) gameTimer.stop();
+    if (updateTimer != null) updateTimer.stop();
 
-        String message;
-        int nextLevelToSave = currentLevelNumber; 
+    String message;
+    int nextLevelToSave = currentLevelNumber;
 
-        if (allServedSuccessfully) {
-            message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
-            if (currentLevelNumber < 10) { 
-                nextLevelToSave = currentLevelNumber + 1;
-            }
-        } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
-            message = "Level " + currentLevelNumber + " Selesai. Semua customer telah pergi.";
-        } else { 
-            message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
+    // === Hitung reward sesuai performa ===
+    int starsGained = 3; // Hitung dari score/penilaian kamu
+    int goldGained = 50; // Hitung dari score/penilaian kamu
+
+    // Update player
+    currentPlayer.addStars(starsGained);
+    currentPlayer.addGold(goldGained);
+
+    // *** JANGAN turunkan level, simpan level maksimum antara progress lama dan progress baru ***
+    if (allServedSuccessfully) {
+        message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
+        if (currentLevelNumber < 10) {
+            nextLevelToSave = currentLevelNumber + 1;
         }
-        JOptionPane.showMessageDialog(GamePanel.this, message);
-        
-        SaveSlotData updatedSlotData = new SaveSlotData(
-            currentPlayer.getUsername(), 
-            nextLevelToSave, 
-            currentPlayer.getTotalStars() 
-        );
-        
-        SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData); 
-        System.out.println("Progress saved to slot " + this.gameSlotNumber + 
-                           ": Player=" + currentPlayer.getUsername() + 
-                           ", Level to save=" + nextLevelToSave + 
-                           ", Stars=" + currentPlayer.getTotalStars());
-
-
-        if (mainFrame != null) {
-            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
-        }
+    } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
+        message = "Level " + currentLevelNumber + " Selesai. Semua customer telah pergi.";
+    } else {
+        message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
     }
+    JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh: " + goldGained + "\nBintang: " + starsGained);
+
+    // === Simpan level tertinggi dan gold/stars terbaru ===
+    // Ambil progress lama dari slotData, kalau level sebelumnya lebih tinggi, jangan pernah turun
+    int maxLevel = Math.max(slotData.getLevel(), nextLevelToSave);
+    int maxStars = Math.max(slotData.getStars(), currentPlayer.getStars());
+    int goldToSave = currentPlayer.getGold(); // gold selalu update
+
+    SaveSlotData updatedSlotData = new SaveSlotData(
+        currentPlayer.getUsername(),
+        maxLevel,
+        maxStars,
+        goldToSave
+    );
+
+    SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData);
+
+    // Tampilkan level select menu dengan player dan slotData terbaru
+    if (mainFrame != null) {
+        mainFrame.showLevelSelectMenu(currentPlayer, updatedSlotData, this.gameSlotNumber);
+    }
+}
 
 
     private void updateOvenStatusVisuals() {
