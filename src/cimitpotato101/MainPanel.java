@@ -103,9 +103,14 @@ public class MainPanel extends JFrame {
         return player;
     }
     public void showLevelSelectMenu(Player player, SaveSlotData slotData, int slotNumber) {
-    // Langsung pakai player yang sudah diupdate (jangan buat baru dari slotData!)
+    // Hapus panel level lama jika ada
+    for (Component comp : cardPanel.getComponents()) {
+        if (comp instanceof LevelSelectMenu) {
+            cardPanel.remove(comp);
+            break;
+        }
+    }
     LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
-
     cardPanel.add(levelSelectPanel, "level");
     cardLayout.show(cardPanel, "level");
     levelSelectPanel.refreshHUD();

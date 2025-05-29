@@ -2,9 +2,6 @@ package cimitpotato101;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.color.ColorSpace;
-import java.awt.event.*;
-import java.awt.image.*;
 import java.net.URL;
 
 public class LevelSelectMenu extends JPanel {
@@ -13,8 +10,9 @@ public class LevelSelectMenu extends JPanel {
     private SaveSlotData slotData;
     private int slotNumber;
     private int maxLevel = 10;
+    
 
-    // Koordinat tombol level (harus disesuaikan dengan background path)
+    // Tombol level
     private final int[][] levelPositions = {
         {390, 450}, // Level 1
         {480, 435}, // Level 2
@@ -32,6 +30,10 @@ public class LevelSelectMenu extends JPanel {
     private Image goldSign;
     private Image starSign;
 
+    // Asset bintang
+    private Image[] starColored = new Image[3]; // star1, star2, star3
+    private Image[] starGray = new Image[3];    // starAbu1, starAbu2, starAbu3
+
     // Tambahkan field label agar bisa di-refresh
     private JLabel goldLabel;
     private JLabel starsLabel;
@@ -46,7 +48,7 @@ public class LevelSelectMenu extends JPanel {
 
         loadImages();
         addHUD();
-        addLevelButtons();
+        addLevelButtonsWithStars();
         addBackButton();
     }
 
@@ -54,28 +56,38 @@ public class LevelSelectMenu extends JPanel {
         background = loadImage("/assets/LevelSelectionMenu.gif");
         goldSign = loadImage("/assets/GoldSign.png");
         starSign = loadImage("/assets/StarSign.png");
+        // Bintang berwarna
+        starColored[0] = loadImage("/assets/star1.png");
+        starColored[1] = loadImage("/assets/star2.png");
+        starColored[2] = loadImage("/assets/star3.png");
+        // Bintang abu-abu
+        starGray[0] = loadImage("/assets/starAbu1.png");
+        starGray[1] = loadImage("/assets/starAbu2.png");
+        starGray[2] = loadImage("/assets/starAbu3.png");
     }
 
     private Image loadImage(String path) {
-        URL url = getClass().getResource(path);
-        if (url != null) {
-            return new ImageIcon(url).getImage();
-        }
+    URL url = getClass().getResource(path);
+    if (url != null) {
+        return new ImageIcon(url).getImage();
+    } else {
+        System.out.println("Gagal load asset: " + path);
         return null;
     }
+}
 
     private void addHUD() {
         // GOLD panel kiri atas
         JLabel goldPanel = new JLabel(new ImageIcon(goldSign));
-        goldPanel.setBounds(40, 0, 260, 100); // ukuran panel gold
+        goldPanel.setBounds(40, 0, 260, 100);
         add(goldPanel);
 
         goldLabel = new JLabel(String.valueOf(player.getGold()), SwingConstants.CENTER);
         goldLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 26));
         goldLabel.setForeground(new Color(0, 0, 0));
-        goldLabel.setBounds(145, 55, 90, 30); // di atas panel gold
+        goldLabel.setBounds(145, 55, 90, 30);
         add(goldLabel);
-        setComponentZOrder(goldLabel, 0); // goldLabel paling atas
+        setComponentZOrder(goldLabel, 0);
         setComponentZOrder(goldPanel, 1);
 
         // STARS panel kanan atas
@@ -92,18 +104,47 @@ public class LevelSelectMenu extends JPanel {
         setComponentZOrder(starPanel, 1);
     }
 
-    private void addLevelButtons() {
-        int unlockedLevel = player.getCurrentLevel();
-        for (int i = 1; i <= maxLevel; i++) {
-            int idx = i - 1;
-            int x = levelPositions[idx][0];
-            int y = levelPositions[idx][1];
+    private void addLevelButtonsWithStars() {
+    int unlockedLevel = player.getCurrentLevel();
+    int starSize = 28;
+    int spacing = 8;
+    int offsetY = 112;
 
-            JButton btn = createLevelButton(i, i <= unlockedLevel);
-            btn.setBounds(x, y, 90, 90);
-            add(btn);
+    for (int i = 1; i <= maxLevel; i++) {
+        int idx = i - 1;
+        int x = levelPositions[idx][0];
+        int y = levelPositions[idx][1];
+
+        JButton btn = createLevelButton(i, i <= unlockedLevel);
+        btn.setBounds(x, y, 90, 90);
+        add(btn);
+
+        // Bintang-bintang (kiri, tengah, kanan)
+        int stars = slotData.getStarsForLevel(i); // level 1 = index 0
+
+        int centerX = x + 45; // center tombol
+        int starY = y + offsetY;
+
+        for (int b = 0; b < 3; b++) {
+            Image img = (stars > b) ? starColored[b] : starGray[b];
+            if (img != null) {
+                ImageIcon icon = new ImageIcon(img.getScaledInstance(starSize, starSize, Image.SCALE_SMOOTH));
+                JLabel starLabel = new JLabel(icon);
+
+                int starX;
+                if (b == 0)      starX = centerX - starSize - spacing; // kiri
+                else if (b == 1) starX = centerX - starSize/2;         // tengah
+                else             starX = centerX + starSize + spacing - starSize; // kanan
+
+                starLabel.setBounds(starX, starY, starSize, starSize);
+                starLabel.setOpaque(false); // transparan background
+
+                add(starLabel);
+                setComponentZOrder(starLabel, 0); // pastikan bintang di depan tombol
+            }
         }
     }
+}
 
     private JButton createLevelButton(int level, boolean unlocked) {
         String imgPath = "/assets/Level" + level + ".png";
@@ -140,7 +181,6 @@ public class LevelSelectMenu extends JPanel {
         backBtn.setFocusPainted(false);
         backBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         backBtn.addActionListener(e -> {
-            // Kembali ke panel Slot
             mainPanel.getCardLayout().show(mainPanel.getCardPanel(), "slots");
         });
         add(backBtn);
@@ -156,9 +196,40 @@ public class LevelSelectMenu extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Gambar background
         if (background != null) {
             g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+        }
+
+        int logoWidth = 90;   // lebar tombol/logo level (sesuaikan dengan asset kamu)
+        int logoHeight = 90;  // tinggi tombol/logo level
+        int starSize = 28;    // ukuran bintang
+        int spacing = 7;      // jarak antar bintang
+        int offsetY = 80;     // jarak dari atas logo ke posisi bintang
+
+        for (int i = 0; i < maxLevel; i++) {
+            int logoX = levelPositions[i][0];
+            int logoY = levelPositions[i][1];
+
+            // Titik tengah bawah logo level
+            int centerX = logoX + logoWidth / 2;
+            int baseY = logoY + offsetY;
+
+            int stars = slotData.getStarsForLevel(i + 1);
+
+            // Hitung posisi X masing-masing bintang (kiri, tengah, kanan)
+            int[] starX = new int[] {
+                centerX - starSize - spacing, // kiri
+                centerX - starSize / 2,       // tengah
+                centerX + starSize + spacing - starSize // kanan
+            };
+
+            // Gambar bintang satu per satu
+            for (int b = 0; b < 3; b++) {
+                Image img = (stars > b) ? starColored[b] : starGray[b];
+                if (img != null) {
+                    g.drawImage(img, starX[b], baseY, starSize, starSize, this);
+                }
+            }
         }
     }
 }
