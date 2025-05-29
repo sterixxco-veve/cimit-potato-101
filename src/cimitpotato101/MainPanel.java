@@ -9,6 +9,7 @@ package cimitpotato101;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList; // Pastikan import ini ada jika menggunakan ArrayList untuk Player
+import java.awt.event.*;
 
 public class MainPanel extends JFrame {
     private CardLayout cardLayout;
@@ -64,7 +65,7 @@ public class MainPanel extends JFrame {
     }
 
     // Implementasi loadOrCreatePlayer (sesuaikan dengan kebutuhan save/load Anda)
-    private Player loadOrCreatePlayer(SaveSlotData slotData) {
+    public Player loadOrCreatePlayer(SaveSlotData slotData) {
         // Untuk tes Level 1, kita bisa buat Player baru setiap kali
         Player player = new Player(slotData.getPlayerName()); 
         player.setCurrentLevel(slotData.getLevel()); 
@@ -99,5 +100,11 @@ public class MainPanel extends JFrame {
         //     SaveObject.saveListPlayer(allPlayers, "players.dat");
         // }
         return player;
+    }
+    public void showLevelSelectMenu(Player player, SaveSlotData slotData, int slotNumber) {
+        String panelId = "level_select_" + System.currentTimeMillis();
+        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
+        cardPanel.add(levelSelectPanel, panelId);
+        cardLayout.show(cardPanel, panelId);
     }
 }

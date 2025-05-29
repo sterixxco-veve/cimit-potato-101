@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package cimitpotato101;
 
 import java.awt.BasicStroke;
@@ -26,7 +21,7 @@ import javax.swing.SwingConstants;
  * @author Aspire
  */
 public class SlotCard extends JPanel {
-    private final int slotNumber; // slotNumber sudah ada sebagai field
+    private final int slotNumber;
     private String playerName;
     private int level;
     private int stars;
@@ -47,7 +42,6 @@ public class SlotCard extends JPanel {
     }
 
     private void addSlotComponents() {
-        // ... (kode untuk membuat label-label lain tetap sama) ...
         JLabel numberCircle = createLabel(String.valueOf(slotNumber), 90, 10, 40, 40, 18, true);
         numberCircle.setBackground(Color.WHITE);
         numberCircle.setOpaque(true);
@@ -55,14 +49,12 @@ public class SlotCard extends JPanel {
         add(numberCircle);
 
         add(createLabel("Save Slot", 40, 60, 140, 20, 14, false));
-        // Pastikan label nama pemain, level, dan bintang diupdate dengan benar
         JLabel playerNameLabel = createLabel(playerName != null && !playerName.isEmpty() ? playerName : "Empty Slot", 40, 90, 140, 30, 20, true);
         JLabel levelLabel = createLabel(playerName != null && !playerName.isEmpty() ? "LEVEL " + level : "", 40, 130, 140, 25, 16, false);
         JLabel starsLabel = createLabel(playerName != null && !playerName.isEmpty() ? stars + " stars" : "", 40, 160, 140, 20, 14, false);
         add(playerNameLabel);
         add(levelLabel);
         add(starsLabel);
-
 
         JButton playBtn = new JButton("Play ▶");
         playBtn.setBounds(60, 230, 100, 40);
@@ -79,33 +71,31 @@ public class SlotCard extends JPanel {
                 String inputName = JOptionPane.showInputDialog(this, "Enter your name:");
                 if (inputName != null && !inputName.trim().isEmpty()) {
                     this.playerName = inputName.trim();
-                    this.level = 1; 
-                    this.stars = 0; 
+                    this.level = 1;
+                    this.stars = 0;
                     slotDataToUse = new SaveSlotData(this.playerName, this.level, this.stars);
                     SaveSlotUtils.saveSlotData(this.slotNumber, slotDataToUse);
-                    
+
                     // Update tampilan label di kartu
                     playerNameLabel.setText(this.playerName);
                     levelLabel.setText("LEVEL " + this.level);
                     starsLabel.setText(this.stars + " stars");
-
                 } else {
-                    return; 
+                    return;
                 }
             } else {
                 slotDataToUse = SaveSlotUtils.loadSlotData(this.slotNumber);
-                // Pastikan field di SlotCard konsisten dengan yang dimuat jika perlu
                 this.playerName = slotDataToUse.getPlayerName();
                 this.level = slotDataToUse.getLevel();
                 this.stars = slotDataToUse.getStars();
-                 // Update tampilan label di kartu jika data berbeda dari yang ditampilkan
                 playerNameLabel.setText(this.playerName);
                 levelLabel.setText("LEVEL " + this.level);
                 starsLabel.setText(this.stars + " stars");
             }
-            
-            // Panggil metode startGame di MainPanel dengan slotData dan this.slotNumber
-            mainFrame.startGame(slotDataToUse, this.slotNumber); 
+
+            // Panggil LevelSelectMenu lewat MainPanel, bukan langsung startGame!
+            Player playerObj = mainFrame.loadOrCreatePlayer(slotDataToUse);
+            mainFrame.showLevelSelectMenu(playerObj, slotDataToUse, this.slotNumber);
         });
         add(playBtn);
     }
