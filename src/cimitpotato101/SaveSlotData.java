@@ -3,7 +3,7 @@ package cimitpotato101;
 import java.io.Serializable;
 
 public class SaveSlotData implements Serializable {
-    private static final long serialVersionUID = 1L; // Tambahkan ini agar serialisasi stabil
+//    private static final long serialVersionUID = 1L; // Tambahkan ini agar serialisasi stabil
 
     private String playerName;
     private int level;
