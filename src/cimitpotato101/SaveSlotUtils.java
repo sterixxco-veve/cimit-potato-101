@@ -34,7 +34,7 @@ public class SaveSlotUtils {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
             return (SaveSlotData) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             return new SaveSlotData("", 1, 0);
         }
     }
