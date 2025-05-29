@@ -832,20 +832,15 @@ public class GamePanel extends JPanel {
     String message;
     int nextLevelToSave = currentLevelNumber;
 
-    // === Hitung reward sesuai performa ===
-    int starsGained = 3; // Hitung dari score/penilaian kamu
-    int goldGained = 50; // Hitung dari score/penilaian kamu
+    int starsGained = 3; // Hitung dari scoring mu
+    int goldGained = 50; // Hitung dari scoring mu
 
-    // Update player
     currentPlayer.addStars(starsGained);
     currentPlayer.addGold(goldGained);
 
-    // *** JANGAN turunkan level, simpan level maksimum antara progress lama dan progress baru ***
-    if (allServedSuccessfully) {
+    if (allServedSuccessfully && currentLevelNumber < 10) {
+        nextLevelToSave = currentLevelNumber + 1;
         message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
-        if (currentLevelNumber < 10) {
-            nextLevelToSave = currentLevelNumber + 1;
-        }
     } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
         message = "Level " + currentLevelNumber + " Selesai. Semua customer telah pergi.";
     } else {
@@ -853,11 +848,12 @@ public class GamePanel extends JPanel {
     }
     JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh: " + goldGained + "\nBintang: " + starsGained);
 
-    // === Simpan level tertinggi dan gold/stars terbaru ===
-    // Ambil progress lama dari slotData, kalau level sebelumnya lebih tinggi, jangan pernah turun
     int maxLevel = Math.max(slotData.getLevel(), nextLevelToSave);
     int maxStars = Math.max(slotData.getStars(), currentPlayer.getStars());
-    int goldToSave = currentPlayer.getGold(); // gold selalu update
+    int goldToSave = currentPlayer.getGold();
+
+    // **Update Player juga!**
+    currentPlayer.setCurrentLevel(maxLevel);
 
     SaveSlotData updatedSlotData = new SaveSlotData(
         currentPlayer.getUsername(),
@@ -868,7 +864,6 @@ public class GamePanel extends JPanel {
 
     SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData);
 
-    // Tampilkan level select menu dengan player dan slotData terbaru
     if (mainFrame != null) {
         mainFrame.showLevelSelectMenu(currentPlayer, updatedSlotData, this.gameSlotNumber);
     }
