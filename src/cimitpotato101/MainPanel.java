@@ -31,7 +31,8 @@ public class MainPanel extends JFrame {
 
         // Tambahkan panel-panel ke dalam CardLayout
         cardPanel.add(new MenuPanel(this), "menu"); 
-        cardPanel.add(new SlotPanel(this), "slots"); 
+        cardPanel.add(new SlotPanel(this), "slots");
+        
         // Jangan tambahkan GamePanel di sini jika akan dibuat dinamis
         // cardPanel.add(new GamePanel(), "game"); // HAPUS ATAU KOMENTARI BARIS INI
 
@@ -56,7 +57,7 @@ public class MainPanel extends JFrame {
         int levelToPlay = slotData.getLevel(); 
 
         // 3. Buat instance GamePanel baru dengan data pemain, level, MainPanel, dan slotNumber
-        GamePanel newGamePanel = new GamePanel(gamePlayer, 10, this, slotNumber);
+        GamePanel newGamePanel = new GamePanel(gamePlayer, levelToPlay, this, slotNumber);
 
         // 4. Ganti panel game yang ada di CardLayout dan tampilkan
         String gamePanelId = "game_instance_" + System.currentTimeMillis(); 
@@ -102,9 +103,13 @@ public class MainPanel extends JFrame {
         return player;
     }
     public void showLevelSelectMenu(Player player, SaveSlotData slotData, int slotNumber) {
-        String panelId = "level_select_" + System.currentTimeMillis();
-        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
-        cardPanel.add(levelSelectPanel, panelId);
-        cardLayout.show(cardPanel, panelId);
+        Player gamePlayer = loadOrCreatePlayer(slotData);
+        
+        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, gamePlayer, slotData, slotNumber);
+        
+        cardPanel.add(levelSelectPanel, "level");
+        
+        cardLayout.show(cardPanel, "level");
+        
     }
 }

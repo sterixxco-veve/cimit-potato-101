@@ -602,7 +602,7 @@ public class GamePanel extends JPanel {
                 restartLevel();
                 break;
             case 2: // Back to Menu
-                goBackToSlots();
+                goBackToLevel();
                 break;
             case JOptionPane.CLOSED_OPTION: // User menutup dialog (dianggap continue)
                  if (!gameEnded) {
@@ -642,7 +642,15 @@ public class GamePanel extends JPanel {
             mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
         }
     }
-
+    
+    private void goBackToLevel(){
+        gameEnded = true;
+        if (gameTimer != null) gameTimer.stop();
+        if (updateTimer != null) updateTimer.stop();
+        if (mainFrame != null) {
+            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "level");
+        }
+    }
 
     private void setupCustomerDisplaySlots() {
         activeCustomersInSlots = new Customer[MAX_VISIBLE_CUSTOMERS];

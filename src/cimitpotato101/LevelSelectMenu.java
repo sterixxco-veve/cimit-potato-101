@@ -16,16 +16,16 @@ public class LevelSelectMenu extends JPanel {
 
     // Koordinat tombol level (harus disesuaikan dengan background path)
     private final int[][] levelPositions = {
-        {140, 510}, // Level 1
-        {230, 435}, // Level 2
-        {310, 370}, // Level 3
+        {390, 450}, // Level 1
+        {480, 435}, // Level 2
+        {450, 360}, // Level 3
         {390, 310}, // Level 4
-        {480, 270}, // Level 5
-        {570, 230}, // Level 6
-        {670, 200}, // Level 7
-        {790, 170}, // Level 8
-        {920, 120}, // Level 9
-        {1040, 80}  // Level 10
+        {500, 270}, // Level 5
+        {390, 230}, // Level 6
+        {480, 160}, // Level 7
+        {390, 140}, // Level 8
+        {460, 90}, // Level 9
+        {390, 40}  // Level 10
     };
 
     private Image background;
@@ -37,6 +37,7 @@ public class LevelSelectMenu extends JPanel {
         this.player = player;
         this.slotData = slotData;
         this.slotNumber = slotNumber;
+        System.out.println("test");
 
         setLayout(null); // pakai absolute layout supaya tombol bisa diatur manual
 
@@ -63,30 +64,34 @@ public class LevelSelectMenu extends JPanel {
     private void addHUD() {
         // GOLD panel kiri atas
         JLabel goldPanel = new JLabel(new ImageIcon(goldSign));
-        goldPanel.setBounds(40, 10, 190, 60); // sesuaikan ukuran panel
+        goldPanel.setBounds(40, 0, 260, 100); // sesuaikan ukuran panel
         add(goldPanel);
 
         JLabel goldLabel = new JLabel(player.getGold() + "", SwingConstants.CENTER);
         goldLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 26));
-        goldLabel.setForeground(new Color(242, 181, 30));
-        goldLabel.setBounds(120, 25, 90, 30); // di atas panel gold
+        goldLabel.setForeground(new Color(0, 0, 0));
+        goldLabel.setBounds(145, 55, 90, 30); // di atas panel gold
         add(goldLabel);
+        setComponentZOrder(goldLabel, 0); // goldLabel paling atas
+        setComponentZOrder(goldPanel, 1);
 
         // STARS panel kanan atas
         JLabel starPanel = new JLabel(new ImageIcon(starSign));
-        starPanel.setBounds(960, 10, 190, 60);
+        starPanel.setBounds(680, 0, 260, 100);
         add(starPanel);
 
         JLabel starsLabel = new JLabel(player.getStars() + "", SwingConstants.CENTER);
         starsLabel.setFont(new Font("Comic Sans MS", Font.BOLD, 26));
-        starsLabel.setForeground(new Color(255, 200, 50));
-        starsLabel.setBounds(1040, 25, 90, 30);
+        starsLabel.setForeground(new Color(0, 0, 0));
+        starsLabel.setBounds(820, 57, 90, 30);
         add(starsLabel);
+        setComponentZOrder(starsLabel, 0); // goldLabel paling atas
+        setComponentZOrder(starPanel, 1);
     }
 
     private void addLevelButtons() {
         int unlockedLevel = player.getCurrentLevel();
-
+        System.out.println(maxLevel);
         for (int i = 1; i <= maxLevel; i++) {
             int idx = i - 1;
             int x = levelPositions[idx][0];
@@ -103,9 +108,9 @@ public class LevelSelectMenu extends JPanel {
         ImageIcon icon = null;
         try {
             icon = new ImageIcon(getClass().getResource(imgPath));
-            if (!unlocked) {
-                icon = new ImageIcon(toGrayScale(icon.getImage()));
-            }
+//            if (!unlocked) {
+//                icon = new ImageIcon(toGrayScale(icon.getImage()));
+//            }
         } catch (Exception e) {
             icon = new ImageIcon();
         }
