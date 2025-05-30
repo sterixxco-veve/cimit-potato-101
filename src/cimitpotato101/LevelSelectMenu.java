@@ -174,17 +174,37 @@ public class LevelSelectMenu extends JPanel {
     }
 
     private void addBackButton() {
-        JButton backBtn = new JButton("Back");
-        backBtn.setBounds(40, 500, 100, 40);
-        backBtn.setBackground(new Color(255, 240, 200));
-        backBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
+        JButton backBtn = new JButton();
+
+        // Load image dari path
+        URL backUrl = getClass().getResource("/assets/backButton.png");
+        if (backUrl != null) {
+            ImageIcon backIcon = new ImageIcon(backUrl);
+            backBtn.setIcon(backIcon);
+            backBtn.setBounds(10, 430, backIcon.getIconWidth(), backIcon.getIconHeight()); // sesuaikan ukuran dgn gambar
+        } else {
+            System.err.println("Back button image not found!");
+            backBtn.setText("Back");
+            backBtn.setBounds(10, 200, 100, 100); // 👈 Atur posisi tombol
+            backBtn.setBackground(new Color(255, 240, 200));
+            backBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
+        }
+
+        // Style agar hanya gambar yang tampak (tanpa border/warna)
+        backBtn.setContentAreaFilled(false);
+        backBtn.setBorderPainted(false);
         backBtn.setFocusPainted(false);
+        backBtn.setOpaque(false);
         backBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Action
         backBtn.addActionListener(e -> {
             mainPanel.getCardLayout().show(mainPanel.getCardPanel(), "slots");
         });
+
         add(backBtn);
     }
+
 
     // Method untuk refresh label gold & stars setelah selesai main
     public void refreshHUD() {

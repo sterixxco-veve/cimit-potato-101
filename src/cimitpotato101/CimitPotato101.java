@@ -21,10 +21,11 @@ public class CimitPotato101{
     
     public static void main(String[] args) {
 //       SwingUtilities.invokeLater(() -> new CimitPotato101());
-      SwingUtilities.invokeLater(() -> new MainPanel()); // Ini akan menampilkan JFrame
+        SwingUtilities.invokeLater(() -> new MainPanel()); // Ini akan menampilkan JFrame
 //       SwingUtilities.invokeLater(() -> new SaveSlotMenu()); // Ini akan menampilkan JFrame
-AudioPlayer a = new AudioPlayer();
-a.playSound();
+        AudioPlayer a = new AudioPlayer();
+        a.playSound();
+
      
     }
 }

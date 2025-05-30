@@ -163,12 +163,11 @@ public class GamePanel extends JPanel {
         this.customersLeftInLevel = this.totalCustomersForLevel; 
         System.out.println("Initialized level data. Generated " + generatedCustomers.size() + " customers for level " + this.currentLevelNumber + ". Queue size: " + customerQueue.size());
 
-        BoosterTier booster = BoosterManager.getBoosterForLevel(this.currentLevelNumber);
         int goal = CustomerOrderManager.getGoalForLevel(this.currentLevelNumber); 
         int duration = CustomerOrderManager.getDurationForLevel(this.currentLevelNumber);
         System.out.println("Level " + this.currentLevelNumber + " - Target Gold: " + goal + ", Duration: " + duration + "s");
 
-        this.activeLevel = new Level(this.currentLevelNumber, goal, duration, unlockedItems, new ArrayList<>(customerQueue), booster);
+        this.activeLevel = new Level(this.currentLevelNumber, goal, duration, unlockedItems, new ArrayList<>(customerQueue));
         this.ovenLogic = this.activeLevel.getOvens(); // Oven di-reset di sini
 
         // Reset visual customer slots
@@ -771,13 +770,14 @@ public class GamePanel extends JPanel {
             String potatoName = customer.getPotato() != null ? customer.getPotato().getNama() : "N/A";
             orderText.append("<b>").append(potatoName).append("</b><br>");
 
-            if (customer.getTopping() != null) {
+            if (customer.getTopping() != "") {
                 orderText.append("+ ").append(customer.getTopping()).append("<br>");
             }
-            if (customer.getSauce() != null) {
+            if (customer.getSauce() != "") {
                 orderText.append("+ ").append(customer.getSauce()).append("<br>");
             }
-            orderText.append("<hr style='margin:1px 0;'>Patience: <b>").append(customer.getPatienceTime()).append("</b></html>");
+            orderText.append("<hr style='margin:1px 0;'>Patience: <b>").append(customer.getPatienceTime()).append("</b>");
+            orderText.append("<hr style='margin:1px 0;'>Emoji: <b>").append(customer.getEmotionEmoji()).append("</b></html>");
             orderLabel.setText(orderText.toString());
             slotPanel.setVisible(true);
         } else if (imageLabel != null && orderLabel != null && slotPanel != null) {

@@ -42,4 +42,14 @@ public class Customer {
     public boolean isAngry() {
         return patienceTime <= 0;
     }
+    
+    public String getEmotionEmoji() {
+        if (patienceTime <= 15) {
+            return "😠"; // marah
+        } else if (patienceTime <= 30) {
+            return "😐"; // datar
+        } else {
+            return "😊"; // senyum
+        }
+    }
 }

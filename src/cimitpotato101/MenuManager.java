@@ -25,8 +25,7 @@ public class MenuManager {
 
     public Level createLevel(int levelNumber, int goal, int duration, List<Customer> customers) {
         List<MenuItem> unlockedItems = MenuUnlock.getUnlockedItems(levelNumber, player);
-        BoosterTier booster = BoosterManager.getBoosterForLevel(levelNumber);
-        return new Level(levelNumber, goal, duration, unlockedItems, customers, booster);
+        return new Level(levelNumber, goal, duration, unlockedItems, customers);
     }
 
 

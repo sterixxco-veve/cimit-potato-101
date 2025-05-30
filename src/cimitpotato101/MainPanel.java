@@ -73,46 +73,26 @@ public class MainPanel extends JFrame {
         player.setStars(slotData.getStars()); 
         player.setGold(slotData.getGold()); // Set gold awal menjadi 0, atau sesuai logika game Anda
         player.initializeUpgradeLevels(); 
-
-        // (Opsional) Jika Anda punya sistem save/load Player yang lebih lengkap, integrasikan di sini.
-        // Contoh:
-        // ArrayList<Player> allPlayers = SaveObject.loadListPlayer("players.dat");
-        // Player existingPlayer = null;
-        // if (allPlayers != null) {
-        //     for (Player p : allPlayers) {
-        //         if (p.getUsername().equalsIgnoreCase(slotData.getPlayerName())) {
-        //             existingPlayer = p;
-        //             // Jika pemain sudah ada, muat gold mereka
-        //             // player.setGold(existingPlayer.getGold()); // Asumsi Player punya metode getGold() yang benar
-        //             break;
-        //         }
-        //     }
-        // }
-        // if (existingPlayer != null) {
-        //     player = existingPlayer; // Gunakan pemain yang sudah ada
-        //     player.setCurrentLevel(slotData.getLevel()); // Pastikan level sesuai dengan slot yang dipilih
-        //     player.setStars(slotData.getStars());
-        // } else {
-        //     // Pemain baru, tambahkan ke daftar dan simpan (jika perlu)
-        //     if (allPlayers == null) {
-        //         allPlayers = new ArrayList<>();
-        //     }
-        //     allPlayers.add(player);
-        //     SaveObject.saveListPlayer(allPlayers, "players.dat");
-        // }
         return player;
     }
+    
     public void showLevelSelectMenu(Player player, SaveSlotData slotData, int slotNumber) {
     // Hapus panel level lama jika ada
-    for (Component comp : cardPanel.getComponents()) {
-        if (comp instanceof LevelSelectMenu) {
-            cardPanel.remove(comp);
-            break;
+        for (Component comp : cardPanel.getComponents()) {
+            if (comp instanceof LevelSelectMenu) {
+                cardPanel.remove(comp);
+                break;
+            }
         }
+        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
+        cardPanel.add(levelSelectPanel, "level");
+        cardLayout.show(cardPanel, "level");
+        levelSelectPanel.refreshHUD();
     }
-    LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
-    cardPanel.add(levelSelectPanel, "level");
-    cardLayout.show(cardPanel, "level");
-    levelSelectPanel.refreshHUD();
+    
+    public void showMainMenu() {
+        cardLayout.show(cardPanel, "menu");
+    }
 }
-}
+
+        

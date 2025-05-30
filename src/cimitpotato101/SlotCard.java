@@ -9,7 +9,9 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.net.URL;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -56,13 +58,26 @@ public class SlotCard extends JPanel {
         add(levelLabel);
         add(starsLabel);
 
-        JButton playBtn = new JButton("Play ▶");
-        playBtn.setBounds(60, 230, 100, 40);
+        URL playBtnUrl = getClass().getResource("/assets/playButtonSlot.png");
+        JButton playBtn = new JButton();
+
+        if (playBtnUrl != null) {
+            ImageIcon playIcon = new ImageIcon(playBtnUrl);
+            playBtn.setIcon(playIcon);
+        } else {
+            System.err.println("Play button image not found!");
+            playBtn.setText("Play ▶"); // fallback jika gambar tidak ditemukan
+        }
+
+        // Buat tombol transparan agar hanya gambar yang terlihat
+        playBtn.setBounds(10, 190, 200, 200); // Ukuran dan posisi (samakan dengan sebelumnya)
+        playBtn.setContentAreaFilled(false);
+        playBtn.setBorderPainted(false);
         playBtn.setFocusPainted(false);
-        playBtn.setBackground(new Color(0, 123, 255));
-        playBtn.setForeground(Color.WHITE);
-        playBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+        playBtn.setOpaque(false);
         playBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        // Aksi saat tombol Play ditekan
         playBtn.addActionListener(e -> {
             boolean isEmpty = (this.playerName == null || this.playerName.isEmpty() || this.playerName.equals("Empty Slot"));
             SaveSlotData slotDataToUse;
@@ -76,7 +91,6 @@ public class SlotCard extends JPanel {
                     slotDataToUse = new SaveSlotData(this.playerName, this.level, this.stars);
                     SaveSlotUtils.saveSlotData(this.slotNumber, slotDataToUse);
 
-                    // Update tampilan label di kartu
                     playerNameLabel.setText(this.playerName);
                     levelLabel.setText("LEVEL " + this.level);
                     starsLabel.setText(this.stars + " stars");
@@ -93,10 +107,10 @@ public class SlotCard extends JPanel {
                 starsLabel.setText(this.stars + " stars");
             }
 
-            // Panggil LevelSelectMenu lewat MainPanel, bukan langsung startGame!
             Player playerObj = mainFrame.loadOrCreatePlayer(slotDataToUse);
             mainFrame.showLevelSelectMenu(playerObj, slotDataToUse, this.slotNumber);
         });
+
         add(playBtn);
     }
 

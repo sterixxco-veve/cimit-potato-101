@@ -1,6 +1,5 @@
 package cimitpotato101;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,18 +17,16 @@ public class Level {
     private int levelNumber;
     private int goal;
     private int duration; // in seconds
-    private BoosterTier booster;
     private List<MenuItem> unlockedItems;
     private List<Customer> customers;
     private Oven[] ovens;
 
-    public Level(int levelNumber, int goal, int duration, List<MenuItem> unlockedItems, List<Customer> customer, BoosterTier booster) {
+    public Level(int levelNumber, int goal, int duration, List<MenuItem> unlockedItems, List<Customer> customer) {
         this.levelNumber = levelNumber;
         this.goal = goal;
         this.duration = duration;
         this.unlockedItems = unlockedItems;
         this.customers = customers;
-        this.booster = booster;
         this.ovens = createOvens();
     }
     
@@ -76,7 +73,4 @@ public class Level {
         return customers;
     }
     
-    public BoosterTier getBoosterTier() {
-        return booster;
-    }
 }
