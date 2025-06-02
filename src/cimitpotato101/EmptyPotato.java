@@ -12,7 +12,7 @@ package cimitpotato101;
 public class EmptyPotato extends Potato{
 
     public EmptyPotato() {
-        super("", 0, 0, "/assets/potatoPiring.png");
+        super("", 0, "/assets/potatoPiring.png");
     }
     
 }

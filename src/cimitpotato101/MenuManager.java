@@ -23,9 +23,9 @@ public class MenuManager {
         this.player = player;
     }
 
-    public Level createLevel(int levelNumber, int goal, int duration, List<Customer> customers) {
+    public Level createLevel(int levelNumber, int duration, List<Customer> customers) {
         List<MenuItem> unlockedItems = MenuUnlock.getUnlockedItems(levelNumber, player);
-        return new Level(levelNumber, goal, duration, unlockedItems, customers);
+        return new Level(levelNumber, duration, unlockedItems, customers);
     }
 
 

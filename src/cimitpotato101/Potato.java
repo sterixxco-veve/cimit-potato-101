@@ -14,24 +14,17 @@ import java.util.ArrayList;
 public class Potato implements MenuItem {
     protected String name;
     protected int price;
-    protected int time;
     protected int upgradeLevel;
     protected String imagePath;
     private ArrayList<String> sauces;
     private ArrayList<String> toppings;
-    public Potato(String name, int price, int time, String imagePath) {
+    public Potato(String name, int price, String imagePath) {
         this.name = name;
         this.price = price;
-        this.time = time;
-        this.upgradeLevel = 0;
+        this.upgradeLevel = 1;
         this.imagePath = imagePath;
         this.toppings = new ArrayList<>();
         this.sauces = new ArrayList<>();
-    }
-
-    @Override
-    public int getTime() {
-        return time;
     }
 
     @Override
@@ -42,11 +35,7 @@ public class Potato implements MenuItem {
     @Override
     public String getNama() {
         return name;
-    }
-    
-    public int getTimeAtLevel(int level) {
-        return Math.max(1, time - level / 3);
-    }  
+    } 
     
     public void setUpgradeLevel(int level) {
         this.upgradeLevel = level;

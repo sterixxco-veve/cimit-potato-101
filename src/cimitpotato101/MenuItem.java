@@ -12,5 +12,4 @@ package cimitpotato101;
 public interface MenuItem {
     String getNama();
     int getHarga();
-    int getTime();
 }

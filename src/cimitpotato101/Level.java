@@ -15,19 +15,19 @@ import java.util.List;
  */
 public class Level {
     private int levelNumber;
-    private int goal;
     private int duration; // in seconds
     private List<MenuItem> unlockedItems;
     private List<Customer> customers;
     private Oven[] ovens;
+    private int[] starGoldThresholds;
 
-    public Level(int levelNumber, int goal, int duration, List<MenuItem> unlockedItems, List<Customer> customer) {
+    public Level(int levelNumber, int duration, List<MenuItem> unlockedItems, List<Customer> customer) {
         this.levelNumber = levelNumber;
-        this.goal = goal;
         this.duration = duration;
         this.unlockedItems = unlockedItems;
         this.customers = customers;
         this.ovens = createOvens();
+        this.starGoldThresholds = starGoldThresholds;
     }
     
     private Oven[] createOvens() {
@@ -49,10 +49,6 @@ public class Level {
         return levelNumber;
     }
 
-    public int getGoal() {
-        return goal;
-    }
-
     public int getDuration() {
         return duration;
     }
@@ -72,5 +68,16 @@ public class Level {
     public List<Customer> getCustomers() {
         return customers;
     }
+
+    public int[] getStarGoldThresholds() {
+        return starGoldThresholds;
+    }
+
+    public void setStarGoldThresholds(int[] starGoldThresholds) {
+        this.starGoldThresholds = starGoldThresholds;
+    }
+    
+    
+    
     
 }

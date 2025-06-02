@@ -11,6 +11,6 @@ package cimitpotato101;
  */
 public class TornadoPotato extends Potato{
     public TornadoPotato() {
-        super("Tornado", 0, 0, "/assets/potatoTornado.png");
+        super("Tornado", 8, "/assets/potatoTornado.png");
     }
 }

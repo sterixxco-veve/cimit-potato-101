@@ -11,6 +11,6 @@ package cimitpotato101;
  */
 public class ChipsPotato extends Potato{
     public ChipsPotato() {
-        super("Chips", 0, 0, "/assets/potatoChips.png");
+        super("Chips", 5, "/assets/potatoChips.png");
     }
 }

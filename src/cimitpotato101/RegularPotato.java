@@ -15,7 +15,7 @@ public class RegularPotato extends Potato{
 
   
     public RegularPotato() {
-        super("Regular", 0, 0, "/assets/potatoRegular.png");
+        super("Regular", 5, "/assets/potatoRegular.png");
         
     }
     

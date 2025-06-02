@@ -55,7 +55,7 @@ public class MenuUnlock {
         }
 
         for (String name : potatoNames) {
-            Potato p = new Potato(name, getPotatoPrice(name), level, getPotatoImage(name));
+            Potato p = new Potato(name, getPotatoPrice(name), getPotatoImage(name));
             p.setUpgradeLevel(player.getUpgradeLevel(name));
             unlocked.add(p);
         }

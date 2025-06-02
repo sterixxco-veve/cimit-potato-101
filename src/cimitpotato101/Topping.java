@@ -11,7 +11,6 @@ package cimitpotato101;
  */
 public class Topping implements MenuItem {
     private String nama;
-    
     private int harga;
     private int time;
     private String kategori; // "sauce" atau "topping"
@@ -35,11 +34,6 @@ public class Topping implements MenuItem {
     @Override
     public int getHarga() {
         return harga;
-    }
-
-    @Override
-    public int getTime() {
-        return time;
     }
 
     public String getKategori() {

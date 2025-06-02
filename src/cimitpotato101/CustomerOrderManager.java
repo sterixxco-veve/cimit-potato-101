@@ -108,16 +108,16 @@ public class CustomerOrderManager {
 
         // Inisialisasi Kriteria Bintang (Skor Gold yang dibutuhkan)
         // Format: {skor_untuk_1_bintang, skor_untuk_2_bintang, skor_untuk_3_bintang}
-        starCriteriaByLevel.put(1, new int[]{50, 65, 80});
-        starCriteriaByLevel.put(2, new int[]{70, 91, 112});
-        starCriteriaByLevel.put(3, new int[]{90, 117, 144});
-        starCriteriaByLevel.put(4, new int[]{120, 156, 192});
-        starCriteriaByLevel.put(5, new int[]{150, 195, 240});
-        starCriteriaByLevel.put(6, new int[]{180, 234, 288});
-        starCriteriaByLevel.put(7, new int[]{220, 286, 352});
-        starCriteriaByLevel.put(8, new int[]{270, 351, 432});
-        starCriteriaByLevel.put(9, new int[]{330, 429, 528});
-        starCriteriaByLevel.put(10, new int[]{400, 520, 640});
+        starCriteriaByLevel.put(1, new int[]{30, 40, 50});     
+        starCriteriaByLevel.put(2, new int[]{50, 60, 70});     
+        starCriteriaByLevel.put(3, new int[]{70, 80, 90});     
+        starCriteriaByLevel.put(4, new int[]{90, 100, 110});   
+        starCriteriaByLevel.put(5, new int[]{110, 120, 130});  
+        starCriteriaByLevel.put(6, new int[]{130, 140, 150});  
+        starCriteriaByLevel.put(7, new int[]{150, 160, 170});  
+        starCriteriaByLevel.put(8, new int[]{170, 180, 190}); 
+        starCriteriaByLevel.put(9, new int[]{190, 200, 210});  
+        starCriteriaByLevel.put(10, new int[]{210, 220, 230});
     }
 
     public static List<CustomerOrderTemplate> getTemplatesForLevel(int level) {
@@ -147,4 +147,6 @@ public class CustomerOrderManager {
         // Mengembalikan array kriteria, atau array default jika level tidak ditemukan
         return starCriteriaByLevel.getOrDefault(level, new int[]{Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE}); 
     }
+    
+    
 }

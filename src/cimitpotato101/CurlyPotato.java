@@ -11,6 +11,6 @@ package cimitpotato101;
  */
 public class CurlyPotato extends Potato{
     public CurlyPotato() {
-        super("Curly", 0, 0, "/assets/potatoCurly.png");
+        super("Curly", 6, "/assets/potatoCurly.png");
     }
 }

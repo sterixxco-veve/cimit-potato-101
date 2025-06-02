@@ -20,8 +20,10 @@ import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays; // Import Arrays
+import java.util.HashMap;
 import java.util.LinkedList; // Menggunakan LinkedList untuk antrian customer
 import java.util.List;
+import java.util.Map;
 import java.util.Queue; // Import Queue
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -74,9 +76,12 @@ public class GamePanel extends JPanel {
 
     // Variabel untuk Info UI Atas
     private JLabel customersInfoLabel; 
-    private JLabel goldInfoLabel;    
+    private JLabel goldInfoLabel;
+    private int goldEarnedThisLevel = 0;
     private int totalCustomersForLevel;
     private int customersLeftInLevel; 
+    private JLabel timerLabel;
+    private EndGamePanel endGameGuiPanel;
 
 
     // Koordinat dan ukuran untuk elemen customer (BERJAJAR KE KANAN)
@@ -96,7 +101,8 @@ public class GamePanel extends JPanel {
     private final int ORDER_BUBBLE_HEIGHT = CUSTOMER_SLOT_HEIGHT - 10; 
 
     private final int MAX_VISIBLE_CUSTOMERS = 3; 
-
+    
+    private final Map<String, Integer> toppingSaucePrices = new HashMap<>();
 
     public GamePanel(Player player, int levelNumber, MainPanel mainFrameRef, int slotNumber, SaveSlotData slotData) {
         this.currentPlayer = player;
@@ -113,6 +119,15 @@ public class GamePanel extends JPanel {
         layeredPane.setLayout(null);
 
         add(layeredPane, BorderLayout.CENTER);
+        
+        timerLabel = new JLabel("Time: 00:00", SwingConstants.CENTER);
+        timerLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        timerLabel.setForeground(Color.WHITE); // Warna teks putih
+        timerLabel.setBackground(new Color(0, 0, 0, 150)); // Latar belakang hitam semi-transparan
+        timerLabel.setOpaque(true); // Penting agar background terlihat
+        timerLabel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10)); // Padding
+        timerLabel.setBounds(20, 20, 150, 30); // Atur posisi X, Y, Lebar, Tinggi
+        layeredPane.add(timerLabel, Integer.valueOf(JLayeredPane.MODAL_LAYER));
 
         URL bgUrl = getClass().getResource("/assets/gameBG.png");
         if (bgUrl != null) {
@@ -141,9 +156,17 @@ public class GamePanel extends JPanel {
         // updateTimer = new Timer(...);
         // updateTimer.start();
         initAvailableToppings();
+        buildToppingSaucePriceLookup();
 
         layeredPane.revalidate();
         layeredPane.repaint();
+    }
+    
+    private void buildToppingSaucePriceLookup() {
+        this.toppingSaucePrices.clear();
+        for (Topping t : this.availableToppings) {
+            this.toppingSaucePrices.put(t.getNama().toLowerCase(), t.getHarga());
+        }
     }
 
     private void initializeLevelData() {
@@ -151,7 +174,7 @@ public class GamePanel extends JPanel {
         this.isPaused = false;
         this.timerStarted = false; // Akan di-set true oleh startGameTimers
         this.arrKentang = new Potato[]{new EmptyPotato(), new EmptyPotato(), new EmptyPotato(), new EmptyPotato()};
-
+        this.goldEarnedThisLevel = 0;
 
         if (this.currentPlayer.getUpgradeLevels() == null) {
              this.currentPlayer.initializeUpgradeLevels();
@@ -166,10 +189,14 @@ public class GamePanel extends JPanel {
         int goal = CustomerOrderManager.getGoalForLevel(this.currentLevelNumber); 
         int duration = CustomerOrderManager.getDurationForLevel(this.currentLevelNumber);
         System.out.println("Level " + this.currentLevelNumber + " - Target Gold: " + goal + ", Duration: " + duration + "s");
-
-        this.activeLevel = new Level(this.currentLevelNumber, goal, duration, unlockedItems, new ArrayList<>(customerQueue));
+        
+        
+        
+        this.activeLevel = new Level(this.currentLevelNumber, duration, unlockedItems, new ArrayList<>(customerQueue));
         this.ovenLogic = this.activeLevel.getOvens(); // Oven di-reset di sini
-
+        
+        int[] thresholds = CustomerOrderManager.getStarCriteriaForLevel(this.currentLevelNumber);
+        this.activeLevel.setStarGoldThresholds(thresholds);
         // Reset visual customer slots
         if (activeCustomersInSlots != null) {
             Arrays.fill(activeCustomersInSlots, null);
@@ -266,7 +293,7 @@ public class GamePanel extends JPanel {
             customersInfoLabel.setText(String.valueOf(customersLeftInLevel)); 
         }
         if (goldInfoLabel != null && currentPlayer != null) {
-            goldInfoLabel.setText(String.valueOf(currentPlayer.getGold()));
+            goldInfoLabel.setText(String.valueOf(this.goldEarnedThisLevel));
         }
     }
 
@@ -398,8 +425,20 @@ public class GamePanel extends JPanel {
 
         if (bestMatchSlot != -1) {
             Customer customerToServe = activeCustomersInSlots[bestMatchSlot];
-            JOptionPane.showMessageDialog(this, "Pesanan untuk Customer ("+ customerToServe.getCustomerImageID() +") cocok!");
-            currentPlayer.addGold(10); 
+            int goldFromServe = 0;
+            goldFromServe += servedPotato.getHarga();
+            
+            if (servedPotato.getToppings() != null) {
+                for (String toppingName : servedPotato.getToppings()) { // toppingName sudah lowercase
+                    goldFromServe += this.toppingSaucePrices.getOrDefault(toppingName, 0);
+                }
+            }
+            if (servedPotato.getSauces() != null) {
+                for (String sauceName : servedPotato.getSauces()) { // sauceName sudah lowercase
+                    goldFromServe += this.toppingSaucePrices.getOrDefault(sauceName, 0);
+                }
+            }
+            this.goldEarnedThisLevel += goldFromServe;
             customersLeftInLevel--; 
             System.out.println("Player gold: " + currentPlayer.getGold() + ", Customers Left: " + customersLeftInLevel);
             
@@ -484,11 +523,11 @@ public class GamePanel extends JPanel {
     }
     
     private void initAvailableToppings() {
-        availableToppings.add(new Topping("bacon", 2000, "topping", 1, "/assets/bacon.png"));
-        availableToppings.add(new Topping("cheese", 1500, "topping", 1, "/assets/cheese.png"));
-        availableToppings.add(new Topping("pepperoin", 1800, "topping", 1, "/assets/pepperoin.png"));
-        availableToppings.add(new Topping("mayo", 1000, "sauce", 1, "/assets/mayo.png"));
-        availableToppings.add(new Topping("tomato", 1000, "sauce", 1, "/assets/tomato.png"));
+        availableToppings.add(new Topping("bacon", 6, "topping", 1, "/assets/bacon.png"));
+        availableToppings.add(new Topping("cheese", 4, "topping", 1, "/assets/cheese.png"));
+        availableToppings.add(new Topping("pepperoin", 6, "topping", 1, "/assets/pepperoin.png"));
+        availableToppings.add(new Topping("mayo", 2, "sauce", 1, "/assets/mayo.png"));
+        availableToppings.add(new Topping("tomato", 2, "sauce", 1, "/assets/tomato.png"));
     }
 
 
@@ -509,7 +548,7 @@ public class GamePanel extends JPanel {
                 public void mouseClicked(MouseEvent e) {
                     if (gameEnded || isPaused) return;
                     for (int j = 0; j < arrKentang.length; j++) {
-                        Potato rp = new Potato("", 0, 0, "");
+                        Potato rp = new Potato("", 0, "");
                         if (arrKentang[j] instanceof RegularPotato) {
                             rp = (RegularPotato) arrKentang[j];
                         }
@@ -617,6 +656,10 @@ public class GamePanel extends JPanel {
     private void restartLevel() {
         System.out.println("Restarting level " + currentLevelNumber);
         // Hentikan timer yang mungkin masih ada
+        if (endGameGuiPanel != null) {
+            layeredPane.remove(endGameGuiPanel);
+            endGameGuiPanel = null;
+        }
         if (gameTimer != null) gameTimer.stop();
         if (updateTimer != null) updateTimer.stop();
 
@@ -629,6 +672,13 @@ public class GamePanel extends JPanel {
         // setupPauseButton(); // Tidak perlu di-reset
         setupCustomerDisplaySlots(); // Setup ulang slot customer
         fillCustomerSlotsFromQueue(); // Isi customer awal
+        
+        if (this.activeLevel != null && timerLabel != null) {
+            int totalSeconds = this.activeLevel.getDuration();
+            int initialMinutes = totalSeconds / 60;
+            int initialSeconds = totalSeconds % 60;
+            timerLabel.setText(String.format("Time: %02d:%02d", initialMinutes, initialSeconds));
+        }
 
         startGameTimers(); // Mulai timer lagi
         layeredPane.revalidate();
@@ -796,7 +846,12 @@ public class GamePanel extends JPanel {
                 activeCustomersInSlots[i].decreasePatience(1); 
                 if (activeCustomersInSlots[i].isAngry()) {
                     System.out.println("Customer " + activeCustomersInSlots[i].getCustomerImageID() + " di slot " + i + " marah dan pergi!");
-                    currentPlayer.addGold(-10); 
+                    int goldPenalty = -10;
+                    this.goldEarnedThisLevel += goldPenalty;
+                    if (this.goldEarnedThisLevel < 0) {
+                        this.goldEarnedThisLevel = 0;
+                    }
+                    
                     if(currentPlayer.getGold() < 0) currentPlayer.setGold(0); 
                     
                     customersLeftInLevel--; 
@@ -822,52 +877,91 @@ public class GamePanel extends JPanel {
     }
 
     private void endGame(boolean allServedSuccessfully) {
-    if (gameEnded) return; 
-    gameEnded = true;
-    isPaused = false;
+        if (gameEnded) return;
+        gameEnded = true;
+        isPaused = false;
 
-    if (gameTimer != null) gameTimer.stop();
-    if (updateTimer != null) updateTimer.stop();
+        if (gameTimer != null) gameTimer.stop();
+        if (updateTimer != null) updateTimer.stop();
 
-    String message;
-    int nextLevelToSave = currentLevelNumber;
+        String message;
+        int nextLevelToSave = currentLevelNumber;
 
-    int starsGained = 3; // Hitung dari scoring mu
-    int goldGained = 50; // Hitung dari scoring mu
+        // --- HITUNG BINTANG BERDASARKAN GOLD LEVEL INI ---
+        int starsGained = 0;
+        if (this.activeLevel != null && this.activeLevel.getStarGoldThresholds() != null) {
+            int[] thresholds = this.activeLevel.getStarGoldThresholds(); // Ambil dari Level object (yang datanya dari CustomerOrderManager)
 
-    currentPlayer.addStars(starsGained);
-    currentPlayer.addGold(goldGained);
+            // Pastikan array thresholds valid (panjangnya 3)
+            if (thresholds.length == 3) {
+                System.out.println("EndGame Check: Level " + this.currentLevelNumber + ", Gold Earned: " + this.goldEarnedThisLevel + ", Thresholds: " + Arrays.toString(thresholds)); // DEBUGGING
 
-    if (allServedSuccessfully && currentLevelNumber < 10) {
-        nextLevelToSave = currentLevelNumber + 1;
-        message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
-    } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
-        message = "Level " + currentLevelNumber + " Selesai. Semua customer telah pergi.";
-    } else {
-        message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
+                if (this.goldEarnedThisLevel >= thresholds[2]) { // Target 3 bintang
+                    starsGained = 3;
+                } else if (this.goldEarnedThisLevel >= thresholds[1]) { // Target 2 bintang
+                    starsGained = 2;
+                } else if (this.goldEarnedThisLevel >= thresholds[0]) { // Target 1 bintang
+                    starsGained = 1;
+                }
+                // Jika goldEarnedThisLevel < thresholds[0], starsGained akan tetap 0
+            } else {
+                System.err.println("Error: Array ambang batas bintang tidak valid untuk level " + this.currentLevelNumber + ". Panjang array: " + thresholds.length);
+                // starsGained akan tetap 0
+            }
+        } else {
+            System.err.println("Tidak bisa menghitung bintang: activeLevel atau target bintangnya null.");
+            if (this.activeLevel == null) {
+                System.err.println("activeLevel adalah null.");
+            } else { // activeLevel tidak null, berarti getStarGoldThresholds() yang null
+                 // Ini seharusnya tidak terjadi jika initializeLevelData sudah benar memanggil CustomerOrderManager.getStarCriteriaForLevel
+                System.err.println("activeLevel.getStarGoldThresholds() adalah null. Data dari CustomerOrderManager: " + Arrays.toString(CustomerOrderManager.getStarCriteriaForLevel(this.currentLevelNumber)));
+            }
+            // starsGained akan tetap 0
+        }
+        System.out.println("EndGame Check: starsGained dihitung sebagai = " + starsGained);
+        currentPlayer.addStars(starsGained); // Tambahkan bintang yang baru didapat ke total pemain
+
+        int goldGainedForMessage = this.goldEarnedThisLevel;
+
+        if (allServedSuccessfully && currentLevelNumber < 10) { // Asumsi max 10 level
+            nextLevelToSave = currentLevelNumber + 1; // Hanya naik level jika semua dilayani dengan sukses
+            message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
+        } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
+            // Level selesai tapi mungkin tidak semua berhasil (misal ada yang marah)
+            // atau berhasil tapi bukan kondisi "allServedSuccessfully" (misal waktu habis setelah semua dilayani)
+            message = "Level " + currentLevelNumber + " Selesai.";
+        } else { // Waktu habis atau kondisi lain
+            message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
+            // Pertimbangkan apakah pemain berhak mendapat bintang jika waktu habis.
+            // Logika saat ini masih memberikan bintang berdasarkan gold yang terkumpul.
+            // Jika tidak ingin, Anda bisa set starsGained = 0 di sini jika !allServedSuccessfully.
+        }
+        JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh di Level Ini: " + goldGainedForMessage + "\nBintang Diraih: " + starsGained);
+
+
+        int maxLevelReachedByPlayer = Math.max(slotData.getLevel(), nextLevelToSave);
+        // Untuk total bintang, kita ambil dari currentPlayer yang sudah diupdate
+        int totalStarsOfPlayer = currentPlayer.getStars();
+        // Jika Anda ingin menyimpan bintang tertinggi yang pernah diraih di slot, bandingkan:
+        // int maxStarsInSlot = Math.max(slotData.getStars(), totalStarsOfPlayer);
+
+        int goldToSave = currentPlayer.getGold() + goldGainedForMessage;
+
+        currentPlayer.setCurrentLevel(maxLevelReachedByPlayer);
+
+        SaveSlotData updatedSlotData = new SaveSlotData(
+            currentPlayer.getUsername(),
+            maxLevelReachedByPlayer,
+            totalStarsOfPlayer, // Simpan total bintang pemain saat ini
+            goldToSave
+        );
+
+        SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData);
+
+        if (mainFrame != null) {
+            mainFrame.showLevelSelectMenu(currentPlayer, updatedSlotData, this.gameSlotNumber);
+        }
     }
-    JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh: " + goldGained + "\nBintang: " + starsGained);
-
-    int maxLevel = Math.max(slotData.getLevel(), nextLevelToSave);
-    int maxStars = Math.max(slotData.getStars(), currentPlayer.getStars());
-    int goldToSave = currentPlayer.getGold();
-
-    // **Update Player juga!**
-    currentPlayer.setCurrentLevel(maxLevel);
-
-    SaveSlotData updatedSlotData = new SaveSlotData(
-        currentPlayer.getUsername(),
-        maxLevel,
-        maxStars,
-        goldToSave
-    );
-
-    SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData);
-
-    if (mainFrame != null) {
-        mainFrame.showLevelSelectMenu(currentPlayer, updatedSlotData, this.gameSlotNumber);
-    }
-}
 
 
     private void updateOvenStatusVisuals() {
@@ -938,11 +1032,19 @@ public class GamePanel extends JPanel {
                     }
                     timeLeft[0]--;
                     if (timeLeft[0] <= 0) {
+                        timerLabel.setText("Time: 00:00");
                         endGame(false); 
+                    } else {
+                        int minutes = timeLeft[0] / 60;
+                        int seconds = timeLeft[0] % 60;
+                        timerLabel.setText(String.format("Time: %02d:%02d", minutes, seconds));
                     }
                 }
             });
             gameTimer.start();
+            int initialMinutes = totalSeconds / 60;
+            int initialSeconds = totalSeconds % 60;
+            timerLabel.setText(String.format("Time: %02d:%02d", initialMinutes, initialSeconds));
             System.out.println("Game timer (re)started for level " + this.activeLevel.getLevelNumber() + " with duration: " + totalSeconds + "s");
         } else {
             System.err.println("Cannot start game timer: activeLevel is null.");
