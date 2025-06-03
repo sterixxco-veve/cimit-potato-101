@@ -83,7 +83,7 @@ public class CustomerOrderManager {
         orderTemplates.put(8, level8Orders);
 
         List<CustomerOrderTemplate> level9Orders = new ArrayList<>();
-        level9Orders.add(new CustomerOrderTemplate("Mashed", "Bacon", "Cheese", false));
+        level9Orders.add(new CustomerOrderTemplate("Mashed", "Bacon", "Mayo", false));
         level9Orders.add(new CustomerOrderTemplate("Tornado", "Pepperoin", null, false));
         level9Orders.add(new CustomerOrderTemplate("Wedges", "Bacon", null, true));
         orderTemplates.put(9, level9Orders);
@@ -95,16 +95,16 @@ public class CustomerOrderManager {
         orderTemplates.put(10, level10Orders);
 
         // Inisialisasi Durasi per Level (dalam detik)
-        levelDurations.put(1, 180); 
-        levelDurations.put(2, 170);
-        levelDurations.put(3, 160);
-        levelDurations.put(4, 150);
-        levelDurations.put(5, 140);
-        levelDurations.put(6, 130);
-        levelDurations.put(7, 120); 
-        levelDurations.put(8, 110);
-        levelDurations.put(9, 100);
-        levelDurations.put(10, 90); 
+        levelDurations.put(1, 100); 
+        levelDurations.put(2, 120);
+        levelDurations.put(3, 130);
+        levelDurations.put(4, 140);
+        levelDurations.put(5, 150);
+        levelDurations.put(6, 160);
+        levelDurations.put(7, 170); 
+        levelDurations.put(8, 180);
+        levelDurations.put(9, 180);
+        levelDurations.put(10, 180); 
 
         // Inisialisasi Kriteria Bintang (Skor Gold yang dibutuhkan)
         // Format: {skor_untuk_1_bintang, skor_untuk_2_bintang, skor_untuk_3_bintang}

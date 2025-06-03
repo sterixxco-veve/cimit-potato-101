@@ -14,6 +14,8 @@ import java.awt.event.*;
 public class MainPanel extends JFrame {
     private CardLayout cardLayout;
     private JPanel cardPanel;
+    private FinalTrophyPanel finalTrophyPanel;
+    private LevelSelectMenu levelSelectMenu;
     // Tambahkan field ini jika Anda membutuhkannya untuk menyimpan state antar pemanggilan
     // private Player currentPlayerForGame; 
     // private int currentLevelForGame;   
@@ -38,6 +40,17 @@ public class MainPanel extends JFrame {
 
         add(cardPanel);
         setVisible(true);
+    }
+    
+    public void showTrophyScreen(Player player, SaveSlotData slotData, int gameSlotNumber) {
+        if (finalTrophyPanel == null) {
+            finalTrophyPanel = new FinalTrophyPanel(this, player, slotData, gameSlotNumber);
+            cardPanel.add(finalTrophyPanel, "finalTrophyScreen"); // "finalTrophyScreen" adalah nama untuk CardLayout
+        } else {
+            // Jika panel sudah ada, update kontennya
+            finalTrophyPanel.updateContent(player, slotData, gameSlotNumber);
+        }
+        cardLayout.show(cardPanel, "finalTrophyScreen");
     }
 
     public CardLayout getCardLayout() {

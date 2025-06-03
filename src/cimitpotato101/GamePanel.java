@@ -81,7 +81,6 @@ public class GamePanel extends JPanel {
     private int totalCustomersForLevel;
     private int customersLeftInLevel; 
     private JLabel timerLabel;
-    private EndGamePanel endGameGuiPanel;
 
 
     // Koordinat dan ukuran untuk elemen customer (BERJAJAR KE KANAN)
@@ -656,10 +655,6 @@ public class GamePanel extends JPanel {
     private void restartLevel() {
         System.out.println("Restarting level " + currentLevelNumber);
         // Hentikan timer yang mungkin masih ada
-        if (endGameGuiPanel != null) {
-            layeredPane.remove(endGameGuiPanel);
-            endGameGuiPanel = null;
-        }
         if (gameTimer != null) gameTimer.stop();
         if (updateTimer != null) updateTimer.stop();
 
@@ -877,6 +872,7 @@ public class GamePanel extends JPanel {
     }
 
     private void endGame(boolean allServedSuccessfully) {
+        String trophyAchieved = null;
         if (gameEnded) return;
         gameEnded = true;
         isPaused = false;
@@ -923,18 +919,17 @@ public class GamePanel extends JPanel {
 
         int goldGainedForMessage = this.goldEarnedThisLevel;
 
-        if (allServedSuccessfully && currentLevelNumber < 10) { // Asumsi max 10 level
-            nextLevelToSave = currentLevelNumber + 1; // Hanya naik level jika semua dilayani dengan sukses
+        if (currentLevelNumber < 10) { // Asumsi max 10 level sebelum trophy
+            nextLevelToSave = currentLevelNumber + 1;
             message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
+        } else if (currentLevelNumber == 10 && (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers() || allServedSuccessfully)) {
+            // Kondisi khusus untuk level 10 selesai
+            message = "Level " + currentLevelNumber + " Selesai! Kamu telah mencapai akhir permainan tahap ini.";
+            // nextLevelToSave tidak perlu diincrement jika 10 adalah max
         } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
-            // Level selesai tapi mungkin tidak semua berhasil (misal ada yang marah)
-            // atau berhasil tapi bukan kondisi "allServedSuccessfully" (misal waktu habis setelah semua dilayani)
             message = "Level " + currentLevelNumber + " Selesai.";
-        } else { // Waktu habis atau kondisi lain
+        } else {
             message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
-            // Pertimbangkan apakah pemain berhak mendapat bintang jika waktu habis.
-            // Logika saat ini masih memberikan bintang berdasarkan gold yang terkumpul.
-            // Jika tidak ingin, Anda bisa set starsGained = 0 di sini jika !allServedSuccessfully.
         }
         JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh di Level Ini: " + goldGainedForMessage + "\nBintang Diraih: " + starsGained);
 
@@ -949,15 +944,43 @@ public class GamePanel extends JPanel {
 
         currentPlayer.setCurrentLevel(maxLevelReachedByPlayer);
 
+        
+        boolean levelSuccessfullyCompleted = (allServedSuccessfully || (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()));
+
+        if (currentLevelNumber == 10 && levelSuccessfullyCompleted) {
+            if (totalStarsOfPlayer >= 25) { // 25-30 bintang untuk Gold
+                trophyAchieved = "Gold";
+            } else if (totalStarsOfPlayer >= 15) { // 15-24 bintang untuk Silver
+                trophyAchieved = "Silver";
+            } else if (totalStarsOfPlayer >= 0) { // 0-14 bintang untuk Bronze
+                trophyAchieved = "Bronze";
+            }
+        }
+        
+        
         SaveSlotData updatedSlotData = new SaveSlotData(
             currentPlayer.getUsername(),
             maxLevelReachedByPlayer,
             totalStarsOfPlayer, // Simpan total bintang pemain saat ini
-            goldToSave
+            goldToSave,
+            trophyAchieved
+                
         );
 
         SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData);
-
+        
+        if (currentLevelNumber == 10) {
+            if (mainFrame != null) {
+                // Panggil method di MainFrame untuk menampilkan layar trofi
+                // currentPlayer dan updatedSlotDataForNextScreen berisi data terbaru
+                mainFrame.showTrophyScreen(currentPlayer, updatedSlotData, this.gameSlotNumber);
+            } else {
+                System.err.println("Error: MainFrame tidak terinisialisasi di GamePanel, tidak bisa menampilkan layar trofi.");
+                // Fallback jika mainFrame null (seharusnya tidak terjadi)
+                JOptionPane.showMessageDialog(GamePanel.this, "Selamat! Anda telah menyelesaikan semua level!", "Game Selesai", JOptionPane.INFORMATION_MESSAGE);
+            }
+            return; // Hentikan eksekusi lebih lanjut di endGame agar tidak langsung ke level select biasa
+        }
         if (mainFrame != null) {
             mainFrame.showLevelSelectMenu(currentPlayer, updatedSlotData, this.gameSlotNumber);
         }

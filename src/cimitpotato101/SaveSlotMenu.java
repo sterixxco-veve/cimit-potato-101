@@ -25,7 +25,7 @@ public class SaveSlotMenu extends JFrame {
 
         for (int i = 0; i < 3; i++) {
             SaveSlotData data = SaveSlotUtils.loadSlotData(i + 1);
-            slots[i] = new SlotCard(i + 1, data.getPlayerName(), data.getLevel(), data.getStars(), mainFrame);
+            slots[i] = new SlotCard(i + 1, data.getPlayerName(), data.getLevel(), data.getStars(), data.getTrophyType(), mainFrame);
             mainPanel.add(slots[i]);
         }
 

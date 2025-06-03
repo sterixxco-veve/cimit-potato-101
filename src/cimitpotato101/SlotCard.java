@@ -28,12 +28,15 @@ public class SlotCard extends JPanel {
     private int level;
     private int stars;
     private final MainPanel mainFrame;
+    private String trophyType;
+    private JLabel trophyInfoLabel;
 
-    public SlotCard(int slotNumber, String playerName, int level, int stars, MainPanel mainFrame) {
+    public SlotCard(int slotNumber, String playerName, int level, int stars, String trophyType, MainPanel mainFrame) {
         this.slotNumber = slotNumber;
         this.playerName = playerName;
         this.level = level;
         this.stars = stars;
+        this.trophyType = trophyType;
         this.mainFrame = mainFrame;
 
         setPreferredSize(new Dimension(220, 320));
@@ -57,6 +60,11 @@ public class SlotCard extends JPanel {
         add(playerNameLabel);
         add(levelLabel);
         add(starsLabel);
+        
+        trophyInfoLabel = createLabel("", 40, 185, 140, 20, 14, false);
+        trophyInfoLabel.setForeground(new Color(139, 69, 19)); // Warna coklat untuk teks trofi (opsional)
+        updateTrophyLabel(); // Panggil method untuk set teks awal
+        add(trophyInfoLabel);
 
         URL playBtnUrl = getClass().getResource("/assets/playButtonSlot.png");
         JButton playBtn = new JButton();
@@ -135,5 +143,15 @@ public class SlotCard extends JPanel {
         g2.setStroke(dashed);
         g2.setColor(Color.BLACK);
         g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 40, 40);
+    }
+    
+    private void updateTrophyLabel() {
+        // Tampilkan info trofi hanya jika pemain sudah di level 10 (atau level maks)
+        // dan memiliki trophyType yang valid.
+        if (this.level == 10 && this.trophyType != null && !this.trophyType.isEmpty()) {
+            trophyInfoLabel.setText("TROPHY: " + this.trophyType);
+        } else {
+            trophyInfoLabel.setText(""); // Kosongkan jika tidak memenuhi syarat
+        }
     }
 }

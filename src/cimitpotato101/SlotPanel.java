@@ -60,7 +60,7 @@ public class SlotPanel extends JPanel {
         rowPanel.setBounds(80, 50, 800, 500); // 👈 Atur posisi slot cards
         for (int i = 1; i <= 3; i++) {
             SaveSlotData data = SaveSlotUtils.loadSlotData(i);
-            SlotCard card = new SlotCard(i, data.getPlayerName(), data.getLevel(), data.getStars(), mainFrame);
+            SlotCard card = new SlotCard(i, data.getPlayerName(), data.getLevel(), data.getStars(), data.getTrophyType(), mainFrame);
             rowPanel.add(card);
         }
         add(rowPanel); // 👈 Tambahkan ke SlotPanel
