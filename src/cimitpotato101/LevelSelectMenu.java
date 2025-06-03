@@ -56,14 +56,7 @@ public class LevelSelectMenu extends JPanel {
         background = loadImage("/assets/LevelSelectionMenu.gif");
         goldSign = loadImage("/assets/GoldSign.png");
         starSign = loadImage("/assets/StarSign.png");
-        // Bintang berwarna
-        starColored[0] = loadImage("/assets/star1.png");
-        starColored[1] = loadImage("/assets/star2.png");
-        starColored[2] = loadImage("/assets/star3.png");
-        // Bintang abu-abu
-        starGray[0] = loadImage("/assets/starAbu1.png");
-        starGray[1] = loadImage("/assets/starAbu2.png");
-        starGray[2] = loadImage("/assets/starAbu3.png");
+        
     }
 
     private Image loadImage(String path) {
@@ -220,36 +213,6 @@ public class LevelSelectMenu extends JPanel {
             g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
         }
 
-        int logoWidth = 90;   // lebar tombol/logo level (sesuaikan dengan asset kamu)
-        int logoHeight = 90;  // tinggi tombol/logo level
-        int starSize = 28;    // ukuran bintang
-        int spacing = 7;      // jarak antar bintang
-        int offsetY = 80;     // jarak dari atas logo ke posisi bintang
-
-        for (int i = 0; i < maxLevel; i++) {
-            int logoX = levelPositions[i][0];
-            int logoY = levelPositions[i][1];
-
-            // Titik tengah bawah logo level
-            int centerX = logoX + logoWidth / 2;
-            int baseY = logoY + offsetY;
-
-            int stars = slotData.getStarsForLevel(i + 1);
-
-            // Hitung posisi X masing-masing bintang (kiri, tengah, kanan)
-            int[] starX = new int[] {
-                centerX - starSize - spacing, // kiri
-                centerX - starSize / 2,       // tengah
-                centerX + starSize + spacing - starSize // kanan
-            };
-
-            // Gambar bintang satu per satu
-            for (int b = 0; b < 3; b++) {
-                Image img = (stars > b) ? starColored[b] : starGray[b];
-                if (img != null) {
-                    g.drawImage(img, starX[b], baseY, starSize, starSize, this);
-                }
-            }
-        }
+        
     }
 }
