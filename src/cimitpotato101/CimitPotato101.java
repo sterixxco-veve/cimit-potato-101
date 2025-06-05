@@ -15,16 +15,14 @@ import javax.swing.SwingUtilities;
 public class CimitPotato101{
 
     public CimitPotato101() {
-//        MainPanel mainMenu = new MainPanel(); // tampilkan GUI dari constructor
-//        GamePanel framePlay = new GamePanel();
     }
     
     public static void main(String[] args) {
-//       SwingUtilities.invokeLater(() -> new CimitPotato101());
         SwingUtilities.invokeLater(() -> new MainPanel()); // Ini akan menampilkan JFrame
-//       SwingUtilities.invokeLater(() -> new SaveSlotMenu()); // Ini akan menampilkan JFrame
         AudioPlayer a = new AudioPlayer();
         a.playSound();
+//        SaveSlotUtils s = new SaveSlotUtils(); //Ini reset data slot
+//        s.saveSlotData(3, new SaveSlotData("", 0, 0));
 
      
     }
