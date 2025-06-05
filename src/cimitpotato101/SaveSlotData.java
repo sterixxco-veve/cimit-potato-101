@@ -18,7 +18,7 @@ public class SaveSlotData implements Serializable {
         this.level = level;
         this.stars = stars;
         this.gold = gold;
-        this.initStarsPerLevel(); // pastikan array terinisialisasi
+        this.initStarsPerLevel();
     }
 
     // Constructor alternatif
@@ -39,20 +39,19 @@ public class SaveSlotData implements Serializable {
         this.initStarsPerLevel();
     }
     
+    // FIX: panggil initStarsPerLevel pada constructor ini
     public SaveSlotData(String playerName, int level, int stars, int gold, String trophyType) {
         this.playerName = playerName;
         this.level = level;
         this.stars = stars;
         this.gold = gold;
         this.trophyType = trophyType;
+        this.initStarsPerLevel(); // <--- WAJIB DITAMBAHKAN!
     }
 
-
-    // Inisialisasi array jika null
     private void initStarsPerLevel() {
         if (this.starsPerLevel == null) {
             this.starsPerLevel = new int[10];
-            // Optional: inisialisasi semua 0
             for (int i = 0; i < 10; i++) this.starsPerLevel[i] = 0;
         }
     }
@@ -69,7 +68,6 @@ public class SaveSlotData implements Serializable {
     public void setGold(int gold) { this.gold = gold; }
     public void setTrophyType(String trophyType) { this.trophyType = trophyType; }
 
-    // PROTEKSI NPE!
     public int getStarsForLevel(int level) {
         initStarsPerLevel();
         if (level >= 1 && level <= 10) return starsPerLevel[level-1];

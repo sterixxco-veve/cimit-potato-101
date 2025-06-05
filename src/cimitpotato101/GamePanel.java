@@ -872,119 +872,94 @@ public class GamePanel extends JPanel {
     }
 
     private void endGame(boolean allServedSuccessfully) {
-        String trophyAchieved = null;
-        if (gameEnded) return;
-        gameEnded = true;
-        isPaused = false;
+    String trophyAchieved = null;
+    if (gameEnded) return;
+    gameEnded = true;
+    isPaused = false;
 
-        if (gameTimer != null) gameTimer.stop();
-        if (updateTimer != null) updateTimer.stop();
+    if (gameTimer != null) gameTimer.stop();
+    if (updateTimer != null) updateTimer.stop();
 
-        String message;
-        int nextLevelToSave = currentLevelNumber;
+    String message;
+    int nextLevelToSave = currentLevelNumber;
 
-        // --- HITUNG BINTANG BERDASARKAN GOLD LEVEL INI ---
-        int starsGained = 0;
-        if (this.activeLevel != null && this.activeLevel.getStarGoldThresholds() != null) {
-            int[] thresholds = this.activeLevel.getStarGoldThresholds(); // Ambil dari Level object (yang datanya dari CustomerOrderManager)
-
-            // Pastikan array thresholds valid (panjangnya 3)
-            if (thresholds.length == 3) {
-                System.out.println("EndGame Check: Level " + this.currentLevelNumber + ", Gold Earned: " + this.goldEarnedThisLevel + ", Thresholds: " + Arrays.toString(thresholds)); // DEBUGGING
-
-                if (this.goldEarnedThisLevel >= thresholds[2]) { // Target 3 bintang
-                    starsGained = 3;
-                } else if (this.goldEarnedThisLevel >= thresholds[1]) { // Target 2 bintang
-                    starsGained = 2;
-                } else if (this.goldEarnedThisLevel >= thresholds[0]) { // Target 1 bintang
-                    starsGained = 1;
-                }
-                // Jika goldEarnedThisLevel < thresholds[0], starsGained akan tetap 0
-            } else {
-                System.err.println("Error: Array ambang batas bintang tidak valid untuk level " + this.currentLevelNumber + ". Panjang array: " + thresholds.length);
-                // starsGained akan tetap 0
+    // --- HITUNG BINTANG BERDASARKAN GOLD LEVEL INI ---
+    int starsGained = 0;
+    if (this.activeLevel != null && this.activeLevel.getStarGoldThresholds() != null) {
+        int[] thresholds = this.activeLevel.getStarGoldThresholds();
+        if (thresholds.length == 3) {
+            if (this.goldEarnedThisLevel >= thresholds[2]) {
+                starsGained = 3;
+            } else if (this.goldEarnedThisLevel >= thresholds[1]) {
+                starsGained = 2;
+            } else if (this.goldEarnedThisLevel >= thresholds[0]) {
+                starsGained = 1;
             }
-        } else {
-            System.err.println("Tidak bisa menghitung bintang: activeLevel atau target bintangnya null.");
-            if (this.activeLevel == null) {
-                System.err.println("activeLevel adalah null.");
-            } else { // activeLevel tidak null, berarti getStarGoldThresholds() yang null
-                 // Ini seharusnya tidak terjadi jika initializeLevelData sudah benar memanggil CustomerOrderManager.getStarCriteriaForLevel
-                System.err.println("activeLevel.getStarGoldThresholds() adalah null. Data dari CustomerOrderManager: " + Arrays.toString(CustomerOrderManager.getStarCriteriaForLevel(this.currentLevelNumber)));
-            }
-            // starsGained akan tetap 0
-        }
-        System.out.println("EndGame Check: starsGained dihitung sebagai = " + starsGained);
-        currentPlayer.addStars(starsGained); // Tambahkan bintang yang baru didapat ke total pemain
-
-        int goldGainedForMessage = this.goldEarnedThisLevel;
-
-        if (currentLevelNumber < 10) { // Asumsi max 10 level sebelum trophy
-            nextLevelToSave = currentLevelNumber + 1;
-            message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
-        } else if (currentLevelNumber == 10 && (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers() || allServedSuccessfully)) {
-            // Kondisi khusus untuk level 10 selesai
-            message = "Level " + currentLevelNumber + " Selesai! Kamu telah mencapai akhir permainan tahap ini.";
-            // nextLevelToSave tidak perlu diincrement jika 10 adalah max
-        } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
-            message = "Level " + currentLevelNumber + " Selesai.";
-        } else {
-            message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
-        }
-        JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh di Level Ini: " + goldGainedForMessage + "\nBintang Diraih: " + starsGained);
-
-
-        int maxLevelReachedByPlayer = Math.max(slotData.getLevel(), nextLevelToSave);
-        // Untuk total bintang, kita ambil dari currentPlayer yang sudah diupdate
-        int totalStarsOfPlayer = currentPlayer.getStars();
-        // Jika Anda ingin menyimpan bintang tertinggi yang pernah diraih di slot, bandingkan:
-        // int maxStarsInSlot = Math.max(slotData.getStars(), totalStarsOfPlayer);
-
-        int goldToSave = currentPlayer.getGold() + goldGainedForMessage;
-
-        currentPlayer.setCurrentLevel(maxLevelReachedByPlayer);
-
-        
-        boolean levelSuccessfullyCompleted = (allServedSuccessfully || (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()));
-
-        if (currentLevelNumber == 10 && levelSuccessfullyCompleted) {
-            if (totalStarsOfPlayer >= 25) { // 25-30 bintang untuk Gold
-                trophyAchieved = "Gold";
-            } else if (totalStarsOfPlayer >= 15) { // 15-24 bintang untuk Silver
-                trophyAchieved = "Silver";
-            } else if (totalStarsOfPlayer >= 0) { // 0-14 bintang untuk Bronze
-                trophyAchieved = "Bronze";
-            }
-        }
-        
-        
-        SaveSlotData updatedSlotData = new SaveSlotData(
-            currentPlayer.getUsername(),
-            maxLevelReachedByPlayer,
-            totalStarsOfPlayer, // Simpan total bintang pemain saat ini
-            goldToSave,
-            trophyAchieved
-                
-        );
-
-        SaveSlotUtils.saveSlotData(this.gameSlotNumber, updatedSlotData);
-        
-        if (currentLevelNumber == 10) {
-            if (mainFrame != null) {
-                // Panggil method di MainFrame untuk menampilkan layar trofi
-                // currentPlayer dan updatedSlotDataForNextScreen berisi data terbaru
-                mainFrame.showTrophyScreen(currentPlayer, updatedSlotData, this.gameSlotNumber);
-            } else {
-                System.err.println("Error: MainFrame tidak terinisialisasi di GamePanel, tidak bisa menampilkan layar trofi.");
-                // Fallback jika mainFrame null (seharusnya tidak terjadi)
-                JOptionPane.showMessageDialog(GamePanel.this, "Selamat! Anda telah menyelesaikan semua level!", "Game Selesai", JOptionPane.INFORMATION_MESSAGE);
-            }
-            return; // Hentikan eksekusi lebih lanjut di endGame agar tidak langsung ke level select biasa
-        }
-        if (mainFrame != null) {
-            mainFrame.showLevelSelectMenu(currentPlayer, updatedSlotData, this.gameSlotNumber);
         }
     }
+    System.out.println("EndGame Check: starsGained dihitung sebagai = " + starsGained);
+    currentPlayer.addStars(starsGained);
+
+    int goldGainedForMessage = this.goldEarnedThisLevel;
+
+    if (currentLevelNumber < 10) {
+        nextLevelToSave = currentLevelNumber + 1;
+        message = "Level " + currentLevelNumber + " Selesai! Semua customer telah dilayani.";
+    } else if (currentLevelNumber == 10 && (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers() || allServedSuccessfully)) {
+        message = "Level " + currentLevelNumber + " Selesai! Kamu telah mencapai akhir permainan tahap ini.";
+    } else if (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()) {
+        message = "Level " + currentLevelNumber + " Selesai.";
+    } else {
+        message = "Waktu Habis untuk Level " + currentLevelNumber + "!";
+    }
+    JOptionPane.showMessageDialog(GamePanel.this, message + "\nGold Diperoleh di Level Ini: " + goldGainedForMessage + "\nBintang Diraih: " + starsGained);
+
+    int maxLevelReachedByPlayer = Math.max(slotData.getLevel(), nextLevelToSave);
+    int totalStarsOfPlayer = currentPlayer.getStars();
+    int goldToSave = currentPlayer.getGold() + goldGainedForMessage;
+
+    currentPlayer.setCurrentLevel(maxLevelReachedByPlayer);
+
+    boolean levelSuccessfullyCompleted = (allServedSuccessfully || (customersLeftInLevel <= 0 && customerQueue.isEmpty() && !anyActiveCustomers()));
+
+    if (currentLevelNumber == 10 && levelSuccessfullyCompleted) {
+        if (totalStarsOfPlayer >= 25) {
+            trophyAchieved = "Gold";
+        } else if (totalStarsOfPlayer >= 15) {
+            trophyAchieved = "Silver";
+        } else if (totalStarsOfPlayer >= 0) {
+            trophyAchieved = "Bronze";
+        }
+    }
+
+    // --- PERBAIKAN PENTING: Update slotData lama, JANGAN buat baru ---
+    // Update bintang per level HANYA jika lebih tinggi dari sebelumnya
+    int prevStars = slotData.getStarsForLevel(currentLevelNumber);
+    if (starsGained > prevStars) {
+        slotData.setStarsForLevel(currentLevelNumber, starsGained);
+    }
+    // Update progress lain
+    slotData.setLevel(maxLevelReachedByPlayer); // hanya naik
+    slotData.setStars(totalStarsOfPlayer); // total bintang
+    slotData.setGold(goldToSave);          // total gold
+    slotData.setTrophyType(trophyAchieved);
+
+    // Save ke file
+    SaveSlotUtils.saveSlotData(this.gameSlotNumber, slotData);
+
+    if (currentLevelNumber == 10 && levelSuccessfullyCompleted) {
+        if (mainFrame != null) {
+            mainFrame.showTrophyScreen(currentPlayer, slotData, this.gameSlotNumber);
+        } else {
+            System.err.println("Error: MainFrame tidak terinisialisasi di GamePanel, tidak bisa menampilkan layar trofi.");
+            JOptionPane.showMessageDialog(GamePanel.this, "Selamat! Anda telah menyelesaikan semua level!", "Game Selesai", JOptionPane.INFORMATION_MESSAGE);
+        }
+        return;
+    }
+    if (mainFrame != null) {
+        mainFrame.showLevelSelectMenu(currentPlayer, slotData, this.gameSlotNumber);
+    }
+}
 
 
     private void updateOvenStatusVisuals() {
