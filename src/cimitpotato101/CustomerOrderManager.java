@@ -109,13 +109,13 @@ public class CustomerOrderManager {
         // Inisialisasi Kriteria Bintang (Skor Gold yang dibutuhkan)
         // Format: {skor_untuk_1_bintang, skor_untuk_2_bintang, skor_untuk_3_bintang}
         starCriteriaByLevel.put(1, new int[]{30, 40, 50});     
-        starCriteriaByLevel.put(2, new int[]{50, 60, 70});     
-        starCriteriaByLevel.put(3, new int[]{70, 80, 90});     
+        starCriteriaByLevel.put(2, new int[]{40, 50, 60});     
+        starCriteriaByLevel.put(3, new int[]{60, 70, 80});     
         starCriteriaByLevel.put(4, new int[]{90, 100, 110});   
-        starCriteriaByLevel.put(5, new int[]{110, 120, 130});  
+        starCriteriaByLevel.put(5, new int[]{100, 110, 120});  
         starCriteriaByLevel.put(6, new int[]{130, 140, 150});  
         starCriteriaByLevel.put(7, new int[]{150, 160, 170});  
-        starCriteriaByLevel.put(8, new int[]{170, 180, 190}); 
+        starCriteriaByLevel.put(8, new int[]{150, 170, 185}); 
         starCriteriaByLevel.put(9, new int[]{190, 200, 210});  
         starCriteriaByLevel.put(10, new int[]{210, 220, 230});
     }
