@@ -35,13 +35,16 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+
 
 /**
  *
  * @author Aspire
  */
 
-public class GamePanel extends JPanel {
+public class GamePanel extends JPanel implements KeyListener {
     // Variabel-variabel yang sudah ada
     private JLabel[] ovenNameLabels = new JLabel[6];
     private JLayeredPane layeredPane;
@@ -102,6 +105,8 @@ public class GamePanel extends JPanel {
     private final int MAX_VISIBLE_CUSTOMERS = 3; 
     
     private final Map<String, Integer> toppingSaucePrices = new HashMap<>();
+    
+
 
     public GamePanel(Player player, int levelNumber, MainPanel mainFrameRef, int slotNumber, SaveSlotData slotData) {
         this.currentPlayer = player;
@@ -161,6 +166,23 @@ public class GamePanel extends JPanel {
         layeredPane.repaint();
     }
     
+//    ini code buat x
+    public void keyPressed(KeyEvent e) {
+    if (e.getKeyChar() == 'x' || e.getKeyChar() == 'X') {
+        if (!gameEnded) {
+            System.out.println("Cheat activated: Force end game.");
+            endGame(false); // Langsung akhiri ronde
+            }
+        }
+    }
+
+        @Override
+        public void keyReleased(KeyEvent e) {}
+
+        @Override
+        public void keyTyped(KeyEvent e) {}
+        
+
     private void buildToppingSaucePriceLookup() {
         this.toppingSaucePrices.clear();
         for (Topping t : this.availableToppings) {
@@ -1004,6 +1026,13 @@ public class GamePanel extends JPanel {
         }
     }
     
+    
+    
+    
+    
+    
+    
+    
     private void startGameTimers() {
         if (gameEnded || timerStarted) { 
             if(timerStarted && gameTimer != null && gameTimer.isRunning()){
@@ -1068,6 +1097,11 @@ public class GamePanel extends JPanel {
     @Override
     public void addNotify() {
         super.addNotify();
+        
+           // Supaya bisa menangkap input keyboard
+            setFocusable(true);
+            requestFocusInWindow();
+            addKeyListener(this);
         if (!timerStarted && !gameEnded && this.activeLevel != null) { 
             startGameTimers();
         } else if (this.activeLevel == null) {
