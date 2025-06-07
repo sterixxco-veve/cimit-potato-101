@@ -30,9 +30,6 @@ public class Player implements Serializable {
         this.gold = 0;
         this.upgradeLevels = new HashMap<>();
     }
-    
-    
-    
 
     public String getUsername() {
         return nama;
