@@ -28,6 +28,9 @@ public class FinalTrophyPanel extends JPanel {
     private static final String BRONZE_TROPHY_PATH = "/assets/Cimit Potato 101 - OOP (2).jpg";
     private static final String BACK_BUTTON_IMG_PATH = "/assets/backButton.png"; // Path dari kode Anda
 
+
+    
+    
     public FinalTrophyPanel(MainPanel mainFrame, Player player, SaveSlotData slotData, int gameSlotNumber) {
         this.mainFrame = mainFrame;
         this.currentPlayer = player;
@@ -51,6 +54,12 @@ public class FinalTrophyPanel extends JPanel {
 
         // Tambahkan tombol back Anda
         addCustomBackButton();
+        
+        
+        
+        
+        
+        
     }
 
     // Method untuk update konten jika panel ini di-reuse
@@ -61,6 +70,10 @@ public class FinalTrophyPanel extends JPanel {
         setTrophyImageBasedOnStars(player.getStars());
         // Tombol back sudah ada, action listenernya akan menggunakan field yang terupdate.
     }
+    
+    
+    
+    
 
     private void setTrophyImageBasedOnStars(int totalStars) {
         String imagePathToLoad = null;

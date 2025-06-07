@@ -168,10 +168,20 @@ public class GamePanel extends JPanel implements KeyListener {
     
 //    ini code buat x
     public void keyPressed(KeyEvent e) {
+        
+        
     if (e.getKeyChar() == 'x' || e.getKeyChar() == 'X') {
         if (!gameEnded) {
             System.out.println("Cheat activated: Force end game.");
             endGame(false); // Langsung akhiri ronde
+            if (e.getKeyChar() == 'x' || e.getKeyChar() == 'X') {
+                if (activeLevel.getLevelNumber() == 10) {
+                    showFinalTrophy(); // langsung tampilkan trofi jika di level 10
+                } else {
+                    endGame(false); // end biasa untuk level lain
+    }
+}
+
             }
         }
     }
@@ -181,6 +191,20 @@ public class GamePanel extends JPanel implements KeyListener {
 
         @Override
         public void keyTyped(KeyEvent e) {}
+        
+        private void showFinalTrophy() {
+            // Pastikan semua timer dan status dihentikan
+            gameEnded = true;
+            if (gameTimer != null) gameTimer.stop();
+            if (updateTimer != null) updateTimer.stop();
+
+            // Tampilkan panel trofi
+            FinalTrophyPanel trophyPanel = new FinalTrophyPanel(mainFrame, currentPlayer, SaveSlotData.empty(), gameSlotNumber);
+            mainFrame.setContentPane(trophyPanel);
+            mainFrame.revalidate();
+            mainFrame.repaint();
+        }
+
         
 
     private void buildToppingSaucePriceLookup() {
