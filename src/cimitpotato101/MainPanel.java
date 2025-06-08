@@ -5,17 +5,16 @@
  */
 package cimitpotato101;
 
-// Di MainPanel.java
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList; // Pastikan import ini ada jika menggunakan ArrayList untuk Player
-import java.awt.event.*;
+
 
 public class MainPanel extends JFrame {
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private FinalTrophyPanel finalTrophyPanel;
     private LevelSelectMenu levelSelectMenu;
+    private SlotPanel slotPanel;
     // Tambahkan field ini jika Anda membutuhkannya untuk menyimpan state antar pemanggilan
     // private Player currentPlayerForGame; 
     // private int currentLevelForGame;   
@@ -30,14 +29,16 @@ public class MainPanel extends JFrame {
 
         cardLayout = new CardLayout();
         cardPanel = new JPanel(cardLayout);
-
+        
         // Tambahkan panel-panel ke dalam CardLayout
         cardPanel.add(new MenuPanel(this), "menu"); 
         cardPanel.add(new SlotPanel(this), "slots");
         
         // Jangan tambahkan GamePanel di sini jika akan dibuat dinamis
         // cardPanel.add(new GamePanel(), "game"); // HAPUS ATAU KOMENTARI BARIS INI
-
+        this.slotPanel = new SlotPanel(this); 
+        cardPanel.add(this.slotPanel, "slots");
+        
         add(cardPanel);
         setVisible(true);
     }
@@ -105,6 +106,14 @@ public class MainPanel extends JFrame {
     
     public void showMainMenu() {
         cardLayout.show(cardPanel, "menu");
+    }
+    
+    public void showSlotSelectionScreen() {
+        // Panggil refresh() terlebih dahulu
+        slotPanel.refresh(); 
+
+        // Kemudian tampilkan panelnya
+        getCardLayout().show(getCardPanel(), "slots");
     }
 }
 

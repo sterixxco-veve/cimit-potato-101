@@ -20,11 +20,13 @@ import javax.swing.JPanel;
  *
  * @author Aspire
  */
+
 public class SlotPanel extends JPanel {
     private Image backgroundImage;
+    private SlotCard[] slotCards = new SlotCard[3];
 
     public SlotPanel(MainPanel mainFrame) {
-        setLayout(null); // Absolute positioning
+        setLayout(null);
         setBorder(BorderFactory.createEmptyBorder(50, 40, 50, 40));
 
         // === Background image ===
@@ -42,28 +44,36 @@ public class SlotPanel extends JPanel {
             ImageIcon backIcon = new ImageIcon(backUrl);
             backButton.setIcon(backIcon);
         } else {
-            System.err.println("Back button image not found!");
             backButton.setText("Back");
         }
         backButton.setContentAreaFilled(false);
         backButton.setBorderPainted(false);
         backButton.setFocusPainted(false);
         backButton.setOpaque(false);
-
-        backButton.setBounds(10, 430, 100, 100); // 👈 Atur posisi tombol
+        backButton.setBounds(10, 430, 100, 100);
         backButton.addActionListener(e -> mainFrame.showMainMenu());
         add(backButton);
 
         // === Slot Cards Panel ===
         JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 40, 80));
         rowPanel.setOpaque(false);
-        rowPanel.setBounds(80, 50, 800, 500); // 👈 Atur posisi slot cards
-        for (int i = 1; i <= 3; i++) {
-            SaveSlotData data = SaveSlotUtils.loadSlotData(i);
-            SlotCard card = new SlotCard(i, data.getPlayerName(), data.getLevel(), data.getStars(), data.getTrophyType(), mainFrame);
-            rowPanel.add(card);
+        rowPanel.setBounds(80, 50, 800, 500);
+        
+        for (int i = 0; i < 3; i++) {
+            SaveSlotData data = SaveSlotUtils.loadSlotData(i + 1);
+            // --- PERUBAHAN 2: Buat SlotCard dan simpan ke dalam array ---
+            slotCards[i] = new SlotCard(i + 1, data.getPlayerName(), data.getLevel(), data.getStars(), data.getTrophyType(), mainFrame);
+            rowPanel.add(slotCards[i]);
         }
-        add(rowPanel); // 👈 Tambahkan ke SlotPanel
+        add(rowPanel);
+    }
+    
+    public void refresh() {
+        for (SlotCard card : slotCards) {
+            if (card != null) {
+                card.refresh();
+            }
+        }
     }
 
     @Override

@@ -513,33 +513,9 @@ public class GamePanel extends JPanel implements KeyListener {
             return false;
         }
 
-//        List<String> itemsOnPlateNormalized = new ArrayList<>();
         String toppingKentang = servedPotato.getToppings().size()>0?servedPotato.getToppings().get(0):"";
         String sausKentang = servedPotato.getSauces().size()>0?servedPotato.getSauces().get(0):"";
 
-//            for(String item : servedPotato.getToppings()){
-//                itemsOnPlateNormalized.add(normalizeItemName(item));
-//            }
-//             for(String item : servedPotato.getSauces()){
-//                itemsOnPlateNormalized.add(normalizeItemName(item));
-//            }
-        
-
-//        String expectedToppingNameNormalized = (customer.getTopping() != null) ? normalizeItemName(customer.getTopping()) : null;
-//        String expectedSauceNameNormalized = (customer.getSauce() != null) ? normalizeItemName(customer.getSauce()) : null;
-
-//        int expectedAdditionalItemsCount = 0;
-//        if (expectedToppingNameNormalized != null) expectedAdditionalItemsCount++;
-//        if (expectedSauceNameNormalized != null) expectedAdditionalItemsCount++;
-        
-//        boolean toppingMatch = true;
-//        if (expectedToppingNameNormalized != null) {
-//            toppingMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedToppingNameNormalized));
-//            if (!toppingMatch) {
-//                System.out.println("Topping salah");
-//                return false;
-//            }
-//        }
         if(!customer.getTopping().equalsIgnoreCase(toppingKentang)){
             System.out.println("Topping salah");
                 return false;
@@ -549,17 +525,6 @@ public class GamePanel extends JPanel implements KeyListener {
                 return false;
         }
 
-//        boolean sauceMatch = true;
-//        if (expectedSauceNameNormalized != null) {
-//            sauceMatch = itemsOnPlateNormalized.stream().anyMatch(item -> item.equalsIgnoreCase(expectedSauceNameNormalized));
-//            if (!sauceMatch){ 
-//                System.out.println("Saos salah");
-//                return false;
-//            }
-//        }
-        
-//        if (itemsOnPlateNormalized.size() != expectedAdditionalItemsCount) return false;
-        
         return true; 
     }
     
@@ -613,7 +578,6 @@ public class GamePanel extends JPanel implements KeyListener {
                                     if(rp.addTopping(t)){
                                         System.out.println("Added " + itemNameForLogic + " to "+rp.getNama()+" on piring " + j + ". Current toppings: " + rp.getToppings());
                                         success=true;
-//                                        break;
                                     }
                                 }
                             }
@@ -1081,13 +1045,6 @@ public class GamePanel extends JPanel implements KeyListener {
                 return new EmptyPotato();
         }
     }
-    
-    
-    
-    
-    
-    
-    
     
     private void startGameTimers() {
         if (gameEnded || timerStarted) { 

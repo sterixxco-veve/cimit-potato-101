@@ -14,19 +14,18 @@ import java.net.URL;
  * @author Aspire
  */
 public class FinalTrophyPanel extends JPanel {
-    private MainPanel mainFrame; // Referensi ke MainFrame untuk navigasi
+    private MainPanel mainFrame;
     private Player currentPlayer;
     private SaveSlotData slotData;
     private int gameSlotNumber;
 
     private JLabel trophyImageLabel;
-    private JButton backButtonInstance; // Menyimpan instance tombol untuk referensi jika perlu
+    private JButton backButtonInstance;
 
-    // Definisikan path gambar trofi (sesuaikan jika perlu, misal di folder /assets/)
     private static final String GOLD_TROPHY_PATH = "/assets/Cimit Potato 101 - OOP.jpg";
     private static final String SILVER_TROPHY_PATH = "/assets/Cimit Potato 101 - OOP (1).jpg";
     private static final String BRONZE_TROPHY_PATH = "/assets/Cimit Potato 101 - OOP (2).jpg";
-    private static final String BACK_BUTTON_IMG_PATH = "/assets/backButton.png"; // Path dari kode Anda
+    private static final String BACK_BUTTON_IMG_PATH = "/assets/backButton.png";
 
     public FinalTrophyPanel(MainPanel mainFrame, Player player, SaveSlotData slotData, int gameSlotNumber) {
         this.mainFrame = mainFrame;
@@ -34,32 +33,24 @@ public class FinalTrophyPanel extends JPanel {
         this.slotData = slotData;
         this.gameSlotNumber = gameSlotNumber;
 
-        // Atur layout untuk FinalTrophyPanel
-        // BorderLayout cocok untuk gambar di tengah dan tombol di bawah.
-        // Jika Anda ingin posisi absolut seperti setBounds, gunakan setLayout(null);
-        // tapi BorderLayout lebih fleksibel.
+        // BorderLayout sudah merupakan pilihan yang tepat untuk ini.
         setLayout(new BorderLayout());
-        setBackground(new Color(220, 220, 220)); // Warna latar belakang contoh
+        setBackground(new Color(245, 245, 220)); // Warna latar sedikit krem
 
         trophyImageLabel = new JLabel();
         trophyImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         trophyImageLabel.setVerticalAlignment(SwingConstants.CENTER);
         add(trophyImageLabel, BorderLayout.CENTER);
 
-        // Tampilkan trofi yang sesuai
         setTrophyImageBasedOnStars(player.getStars());
-
-        // Tambahkan tombol back Anda
         addCustomBackButton();
     }
 
-    // Method untuk update konten jika panel ini di-reuse
     public void updateContent(Player player, SaveSlotData slotData, int gameSlotNumber) {
         this.currentPlayer = player;
         this.slotData = slotData;
         this.gameSlotNumber = gameSlotNumber;
         setTrophyImageBasedOnStars(player.getStars());
-        // Tombol back sudah ada, action listenernya akan menggunakan field yang terupdate.
     }
 
     private void setTrophyImageBasedOnStars(int totalStars) {
@@ -80,61 +71,52 @@ public class FinalTrophyPanel extends JPanel {
         if (imagePathToLoad != null) {
             URL imageUrl = getClass().getResource(imagePathToLoad);
             if (imageUrl != null) {
-                ImageIcon icon = new ImageIcon(imageUrl);
-                trophyImageLabel.setIcon(icon);
-                trophyImageLabel.setText("<html><div style='text-align: center;'>" + trophyName + "<br>Total Bintang: " + totalStars + "</div></html>");
-                trophyImageLabel.setVerticalTextPosition(SwingConstants.BOTTOM);
-                trophyImageLabel.setHorizontalTextPosition(SwingConstants.CENTER);
-                trophyImageLabel.setFont(new Font("Arial", Font.BOLD, 24)); // Atur font jika perlu
+                ImageIcon originalIcon = new ImageIcon(imageUrl);
+                Image scaledImage = originalIcon.getImage().getScaledInstance(970, 570, Image.SCALE_SMOOTH);
+                trophyImageLabel.setIcon(new ImageIcon(scaledImage));
             } else {
-                trophyImageLabel.setIcon(null);
-                trophyImageLabel.setText("Gagal memuat gambar trofi: " + imagePathToLoad);
+                trophyImageLabel.setText("Gagal memuat: " + imagePathToLoad);
                 System.err.println("Error: Gambar trofi tidak ditemukan di: " + imagePathToLoad);
             }
+
+            // Set gambar agar memenuhi seluruh panel
+            trophyImageLabel.setBounds(0, 0, 970, 570);
         } else {
             trophyImageLabel.setIcon(null);
             trophyImageLabel.setText("Selamat! Total Bintang: " + totalStars);
         }
     }
 
-    // Menggunakan dan menyesuaikan method addBackButton dari Anda
     private void addCustomBackButton() {
         backButtonInstance = new JButton();
 
         URL backUrl = getClass().getResource(BACK_BUTTON_IMG_PATH);
         if (backUrl != null) {
             ImageIcon backIcon = new ImageIcon(backUrl);
+            // Kita tidak perlu mengubah ukuran tombol back, biarkan sesuai ukuran ikon aslinya
             backButtonInstance.setIcon(backIcon);
-            // Jika menggunakan BorderLayout, setBounds tidak diperlukan di sini.
-            // Ukuran tombol akan diatur oleh icon atau preferensi layout.
-            // backBtn.setBounds(10, 430, backIcon.getIconWidth(), backIcon.getIconHeight());
         } else {
             System.err.println("Back button image not found at " + BACK_BUTTON_IMG_PATH + "!");
-            backButtonInstance.setText("Kembali ke Menu Level");
-            // backBtn.setBounds(10, 430, 200, 50); // Sesuaikan jika layout null
-            backButtonInstance.setBackground(new Color(255, 240, 200));
+            backButtonInstance.setText("Kembali");
             backButtonInstance.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
         }
 
         backButtonInstance.setContentAreaFilled(false);
         backButtonInstance.setBorderPainted(false);
         backButtonInstance.setFocusPainted(false);
-        // backButtonInstance.setOpaque(false); // Hati-hati, ini bisa membuat teks tidak terlihat jika tidak ada ikon
         backButtonInstance.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Action: Kembali ke menu pemilihan level melalui MainFrame
         backButtonInstance.addActionListener(e -> {
             if (mainFrame != null) {
-                // Pastikan currentPlayer, slotData, gameSlotNumber adalah yang terbaru
                 mainFrame.showLevelSelectMenu(currentPlayer, slotData, gameSlotNumber);
             } else {
                 System.err.println("Error: Referensi MainFrame null di FinalTrophyPanel.");
             }
         });
 
-        // Panel untuk menampung tombol, agar bisa diposisikan (misal di bawah)
-        JPanel buttonContainerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20)); // FlowLayout.CENTER dengan padding
-        buttonContainerPanel.setOpaque(false); // Buat panel kontainer transparan
+        // Panel untuk menampung tombol agar posisinya bagus di bawah
+        JPanel buttonContainerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
+        buttonContainerPanel.setOpaque(false);
         buttonContainerPanel.add(backButtonInstance);
 
         add(buttonContainerPanel, BorderLayout.SOUTH); // Tambahkan panel tombol ke bagian bawah

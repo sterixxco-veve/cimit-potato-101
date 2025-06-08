@@ -11,7 +11,7 @@ public class LevelSelectMenu extends JPanel {
     private int slotNumber;
     private int maxLevel = 10;
 
-    // Tombol level
+    // Koordinat Tombol level
     private final int[][] levelPositions = {
         {390, 450}, // Level 1
         {480, 435}, // Level 2
@@ -154,11 +154,11 @@ public class LevelSelectMenu extends JPanel {
         if (backUrl != null) {
             ImageIcon backIcon = new ImageIcon(backUrl);
             backBtn.setIcon(backIcon);
-            backBtn.setBounds(10, 430, backIcon.getIconWidth(), backIcon.getIconHeight()); // sesuaikan ukuran dgn gambar
+            backBtn.setBounds(10, 430, backIcon.getIconWidth(), backIcon.getIconHeight()); // sesuaikan ukuran dgn src gambar
         } else {
             System.err.println("Back button image not found!");
             backBtn.setText("Back");
-            backBtn.setBounds(10, 200, 100, 100); // 👈 Atur posisi tombol
+            backBtn.setBounds(10, 200, 100, 100); // Atur posisi tombol
             backBtn.setBackground(new Color(255, 240, 200));
             backBtn.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
         }
@@ -170,9 +170,9 @@ public class LevelSelectMenu extends JPanel {
         backBtn.setOpaque(false);
         backBtn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Action
+        // back button on clicked
         backBtn.addActionListener(e -> {
-            mainPanel.getCardLayout().show(mainPanel.getCardPanel(), "slots");
+            mainPanel.showSlotSelectionScreen();
         });
 
         add(backBtn);
@@ -182,7 +182,7 @@ public class LevelSelectMenu extends JPanel {
     public void refreshHUD() {
         if (goldLabel != null) goldLabel.setText(String.valueOf(player.getGold()));
         if (starsLabel != null) starsLabel.setText(String.valueOf(player.getStars()));
-        refreshLevelButtons(); // <-- tambahkan ini agar tombol level update
+        refreshLevelButtons(); // buat refresh tombol level
     }
 
     @Override
@@ -191,6 +191,5 @@ public class LevelSelectMenu extends JPanel {
         if (background != null) {
             g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
         }
-        // Sudah tidak ada gambar bintang di sini.
     }
 }
