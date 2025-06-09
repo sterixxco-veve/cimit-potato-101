@@ -34,7 +34,7 @@ public class MenuUnlock {
         unlockedToppings.put(1, createList("Tomato"));
         unlockedToppings.put(2, createList("Mayo"));
         unlockedToppings.put(3, createList("Cheese"));
-        unlockedToppings.put(7, createList("Pepperoni"));
+        unlockedToppings.put(7, createList("Pepperoin"));
         unlockedToppings.put(9, createList("Bacon"));
     }
 

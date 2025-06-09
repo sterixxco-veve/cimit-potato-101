@@ -17,7 +17,6 @@ import java.util.Map;
 public class CustomerOrderManager {
     private static final Map<Integer, Integer> customerCountByLevel = new HashMap<>();
     private static final Map<Integer, List<CustomerOrderTemplate>> orderTemplates = new HashMap<>();
-    private static final Map<Integer, Integer> levelGoalsOld = new HashMap<>(); // Target gold lama, mungkin tidak terpakai
     private static final Map<Integer, Integer> levelDurations = new HashMap<>(); 
     
     // Struktur baru untuk menyimpan kriteria bintang: Level -> {skor_1_bintang, skor_2_bintang, skor_3_bintang}

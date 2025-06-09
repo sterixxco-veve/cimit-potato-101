@@ -12,6 +12,7 @@ import java.util.Random;
  *
  * @author Gracia Krisnanda
  */
+// untuk menciptakan daftar pelanggan 
 public class CustomerFactory {
     private static final String[] CUSTOMER_IMAGE_IDS = {"customer1", "customer2", "customer3"}; // Daftar ID gambar customer
     private static final int DEFAULT_PATIENCE_TIME = 60; // Waktu kesabaran default (detik)
@@ -46,17 +47,15 @@ public class CustomerFactory {
 
             // Gunakan waktu kesabaran default, tidak lagi random
             int patience = DEFAULT_PATIENCE_TIME; 
-            
+            // Memilih ID gambar pelanggan secara acak dari array       
             String customerImageID = CUSTOMER_IMAGE_IDS[random.nextInt(CUSTOMER_IMAGE_IDS.length)];
-            
-            // Pastikan constructor Customer di Customer.java menerima customerImageID
+
             customers.add(new Customer(potato, topping, sauce, patience, customerImageID));
         }
 
         return customers;
     }
 
-    // findPotato dan findTopping tetap sama, pastikan mereka bekerja dengan baik
     // untuk mencocokkan nama dari template dengan nama di MenuItem
     private static MenuItem findPotato(String name, List<MenuItem> items) {
         if (name == null) return null;

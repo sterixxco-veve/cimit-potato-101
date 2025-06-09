@@ -256,6 +256,7 @@ public class GamePanel extends JPanel implements KeyListener {
         JPanel topInfoPanel = new JPanel(null); 
         int panelWidth = 220; 
         int panelHeight = 40; 
+        // untuk menentukan posisi x dan y         
         topInfoPanel.setBounds((getWidth() > 0 ? (getWidth() - panelWidth) / 2 : (970 - panelWidth) / 2), 20, panelWidth, panelHeight); 
         topInfoPanel.setOpaque(false); 
         
@@ -277,7 +278,9 @@ public class GamePanel extends JPanel implements KeyListener {
         contentPanel.setOpaque(false); 
 
         int iconSize = 22; 
+        //  Menghitung posisi Y agar ikon dan teks berada di tengah secara vertikal di dalam panel.        
         int textOffsetY = (panelHeight - iconSize) / 2; 
+        // titik awal posisi x (horizontal), dimulai dari 10px dari kiri        
         int currentX = 10; 
 
         JLabel customerIconLabel = new JLabel();
@@ -325,6 +328,7 @@ public class GamePanel extends JPanel implements KeyListener {
             topInfoPanel.add(contentPanel); 
         }
         
+        // memastikan panel ini ditampilkan pada "lapisan" yang tinggi, di atas komponen game lainnya.        
         layeredPane.add(topInfoPanel, Integer.valueOf(JLayeredPane.PALETTE_LAYER + 10)); 
         updateTopInfoUILabels(); 
     }
@@ -442,8 +446,9 @@ public class GamePanel extends JPanel implements KeyListener {
             }
         }
     }
-
-    private void tryServePotatoToCustomer(int piringIndex) {
+    
+    // menyajikan kentang dari piring yg dipilih    
+    private void tryServePotatoToCustomer(int piringIndex) {        
         if (gameEnded || isPaused || arrKentang[piringIndex] instanceof EmptyPotato) {
             return;
         }
@@ -452,6 +457,7 @@ public class GamePanel extends JPanel implements KeyListener {
         int bestMatchSlot = -1;
         int lowestPatience = Integer.MAX_VALUE;
 
+        // mencari dari data pelanggan yg ada trus diambil yg cocok + patience terendah        
         for (int i = 0; i < MAX_VISIBLE_CUSTOMERS; i++) {
             if (activeCustomersInSlots[i] != null) {
                 Customer targetCustomer = activeCustomersInSlots[i];
@@ -498,6 +504,7 @@ public class GamePanel extends JPanel implements KeyListener {
         JOptionPane.showMessageDialog(this, "Tidak ada customer yang cocok dengan kentang ini.");
     }
 
+    // untuk mastiin semua nama itu tanpa potato    
     private String normalizeItemName(String name) { 
         if (name == null) return "";
         return name.toLowerCase().replace(" potato", "").trim();
@@ -703,7 +710,8 @@ public class GamePanel extends JPanel implements KeyListener {
             mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "level");
         }
     }
-
+    
+    // mempersiapkan slot2nya     
     private void setupCustomerDisplaySlots() {
         activeCustomersInSlots = new Customer[MAX_VISIBLE_CUSTOMERS];
         customerSlotPanels = new JPanel[MAX_VISIBLE_CUSTOMERS];

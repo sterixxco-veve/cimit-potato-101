@@ -33,11 +33,12 @@ public class FinalTrophyPanel extends JPanel {
         this.slotData = slotData;
         this.gameSlotNumber = gameSlotNumber;
 
-        // BorderLayout sudah merupakan pilihan yang tepat untuk ini.
         setLayout(new BorderLayout());
         setBackground(new Color(245, 245, 220)); // Warna latar sedikit krem
 
         trophyImageLabel = new JLabel();
+        // Jika JLabel lebih besar dari gambar yang ditampilkan, 
+        // maka gambar akan diposisikan di tengah secara horizontal / vertical        
         trophyImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
         trophyImageLabel.setVerticalAlignment(SwingConstants.CENTER);
         add(trophyImageLabel, BorderLayout.CENTER);
@@ -69,11 +70,11 @@ public class FinalTrophyPanel extends JPanel {
         }
 
         if (imagePathToLoad != null) {
+            // mencari lokasi file             
             URL imageUrl = getClass().getResource(imagePathToLoad);
             if (imageUrl != null) {
                 ImageIcon originalIcon = new ImageIcon(imageUrl);
-                Image scaledImage = originalIcon.getImage().getScaledInstance(970, 570, Image.SCALE_SMOOTH);
-                trophyImageLabel.setIcon(new ImageIcon(scaledImage));
+                trophyImageLabel.setIcon((originalIcon));
             } else {
                 trophyImageLabel.setText("Gagal memuat: " + imagePathToLoad);
                 System.err.println("Error: Gambar trofi tidak ditemukan di: " + imagePathToLoad);
@@ -93,16 +94,17 @@ public class FinalTrophyPanel extends JPanel {
         URL backUrl = getClass().getResource(BACK_BUTTON_IMG_PATH);
         if (backUrl != null) {
             ImageIcon backIcon = new ImageIcon(backUrl);
-            // Kita tidak perlu mengubah ukuran tombol back, biarkan sesuai ukuran ikon aslinya
             backButtonInstance.setIcon(backIcon);
         } else {
             System.err.println("Back button image not found at " + BACK_BUTTON_IMG_PATH + "!");
             backButtonInstance.setText("Kembali");
             backButtonInstance.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
         }
-
+        // Membuat area utama tombol menjadi transparan, sehingga tidak ada latar belakang abu-abu standar.
         backButtonInstance.setContentAreaFilled(false);
+        // Menghilangkan garis tepi (border) di sekitar tombol.       
         backButtonInstance.setBorderPainted(false);
+        // Menghilangkan garis putus2 saat button diklik       
         backButtonInstance.setFocusPainted(false);
         backButtonInstance.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
@@ -116,24 +118,12 @@ public class FinalTrophyPanel extends JPanel {
 
         // Panel untuk menampung tombol agar posisinya bagus di bawah
         JPanel buttonContainerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 20));
+        // membuat panel pembungkus ini transparan, sehingga hanya tombolnya yang terlihat.
         buttonContainerPanel.setOpaque(false);
+        // memasukkan tombol ke dalam panel pembungkus tersebut.
         buttonContainerPanel.add(backButtonInstance);
 
         add(buttonContainerPanel, BorderLayout.SOUTH); // Tambahkan panel tombol ke bagian bawah
-
-        // Jika Anda MUTLAK harus menggunakan setBounds untuk tombol:
-        // 1. Panel ini (FinalTrophyPanel) harus `setLayout(null);`
-        // 2. Anda harus mengatur `setBounds()` untuk `trophyImageLabel` juga.
-        // 3. Tambahkan `backButtonInstance` langsung ke panel ini: `add(backButtonInstance);`
-        //    dan atur `backButtonInstance.setBounds(10, 430, backIcon.getIconWidth(), backIcon.getIconHeight());`
-        //    (atau ukuran teks jika ikon gagal dimuat).
-        //    Contoh jika layout null:
-        //    setLayout(null);
-        //    trophyImageLabel.setBounds(50, 50, 700, 400); // Sesuaikan x, y, width, height
-        //    add(trophyImageLabel);
-        //    // (kode untuk setup backButtonInstance)
-        //    backButtonInstance.setBounds(10, 430, backIcon != null ? backIcon.getIconWidth() : 150, backIcon != null ? backIcon.getIconHeight() : 50);
-        //    add(backButtonInstance);
     }
 
     
