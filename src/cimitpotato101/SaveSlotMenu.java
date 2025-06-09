@@ -9,6 +9,7 @@ import java.awt.*;
 
 
 public class SaveSlotMenu extends JFrame {
+    // Menampilkan tampilan pilihan slot (misal: 3 slot save), dan memanggil MainPanel untuk membuka data slot yang dipilih.
     private JPanel mainPanel;
     private SlotCard[] slots = new SlotCard[3];
     private MainPanel mainFrame;

@@ -4,22 +4,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 
-/**
- *
- * @author Gracia Krisnanda
- */
-public class Level {
-    private int levelNumber;
-    private int duration; // in seconds
-    private List<MenuItem> unlockedItems;
-    private List<Customer> customers;
-    private Oven[] ovens;
-    private int[] starGoldThresholds;
+public class Level { // Mewakili satu level permainan, berisi seluruh data dan aturan pada level tersebut (durasi, pelanggan, menu yang terbuka, oven, dan kriteria bintang).
+    private int levelNumber; // nomor urut level
+    private int duration; // lama permainan dalam detik
+    private List<MenuItem> unlockedItems; // menu yang ke unlocked di level tersebut
+    private List<Customer> customers; // jumlah customer yang bakal muncul
+    private Oven[] ovens; // untuk membuat oven 
+    private int[] starGoldThresholds; // batas gold untuk mendapat kan bintang 1, 2, atau 3
 
     public Level(int levelNumber, int duration, List<MenuItem> unlockedItems, List<Customer> customer) {
         this.levelNumber = levelNumber;

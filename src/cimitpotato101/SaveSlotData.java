@@ -3,6 +3,7 @@ package cimitpotato101;
 import java.io.Serializable;
 
 public class SaveSlotData implements Serializable {
+    // Menyimpan progress pemain pada satu save slot (termasuk gold, bintang, level terbuka, dan progress per level).
     private static final long serialVersionUID = 1L;
 
     private String playerName;

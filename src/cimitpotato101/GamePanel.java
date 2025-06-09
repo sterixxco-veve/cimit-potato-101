@@ -210,7 +210,7 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
 
-    private void initializeLevelData() {
+    private void initializeLevelData() { // Menyiapkan semua data dan UI yang diperlukan saat memulai level baru (reset state, generate pelanggan, unlock menu, set timer, dsb).
         this.gameEnded = false;
         this.isPaused = false;
         this.timerStarted = false; // Akan di-set true oleh startGameTimers
@@ -933,7 +933,8 @@ public class GamePanel extends JPanel implements KeyListener {
         executeEndGameLogic(starsGained, levelSuccessfullyCompleted);
     }
 
-    private void executeEndGameLogic(int starsGained, boolean levelSuccessfullyCompleted) {
+    private void executeEndGameLogic(int starsGained, boolean levelSuccessfullyCompleted) { 
+        // Menyelesaikan proses akhir saat level selesai (baik menang atau gagal), menghitung bintang, update progress, dan menyimpan data.
         String trophyAchieved = null;
         if (gameEnded) return;
         gameEnded = true;
@@ -1022,7 +1023,8 @@ public class GamePanel extends JPanel implements KeyListener {
     }
 
 
-    private void updateOvenStatusVisuals() {
+    private void updateOvenStatusVisuals() { // Loop semua oven, jika sudah siap (isReady()), kasih border hijau pada oven di UI.
+
         if (this.ovenLogic == null) return;
         for (int i = 0; i < this.ovenLogic.length; i++) {
             if (this.ovenLogic[i] != null && ovenLabels[i] != null) {
@@ -1036,7 +1038,7 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
 
-    private void updatePiringVisuals() {
+    private void updatePiringVisuals() { // Loop semua piring, update gambar/icon piring sesuai isi piring (kentang kosong, potato, sudah ada topping, dsb).
         for (int i = 0; i < arrKentang.length; i++) {
             if (piringLabels[i] != null && arrKentang[i] != null) {
                 String path = arrKentang[i].getImagePath();

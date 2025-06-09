@@ -13,6 +13,7 @@ package cimitpotato101;
 import java.io.*;
 
 public class SaveSlotUtils {
+    // Menyimpan dan memuat data SaveSlotData ke/dari file menggunakan serialization 
     private static final String FILE_PREFIX = "save_slot_";
     private static final String FILE_SUFFIX = ".dat";
 
