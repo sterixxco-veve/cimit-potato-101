@@ -166,7 +166,7 @@ public class GamePanel extends JPanel implements KeyListener {
         layeredPane.repaint();
     }
     
-//    ini code buat x
+//    ini code buat x 
     public void keyPressed(KeyEvent e) {
         // Hentikan jika game sudah berakhir untuk mencegah cheat diaktifkan berkali-kali
         if (gameEnded) {
