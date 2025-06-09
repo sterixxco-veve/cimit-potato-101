@@ -16,6 +16,8 @@ import java.util.Set;
  * @author Gracia Krisnanda
  */
 public class MenuUnlock {
+//     1. Data daftar kentang dan topping yang terbuka berdasarkan level
+    
     private static final Map<Integer, List<String>> unlockedPotatoes = new HashMap<>();
     private static final Map<Integer, List<String>> unlockedToppings = new HashMap<>();
 
@@ -36,30 +38,35 @@ public class MenuUnlock {
         unlockedToppings.put(9, createList("Bacon"));
     }
 
+    
+//    ambil semua potato item yang sudah terbuka
     public static List<MenuItem> getUnlockedItems(int level, Player player) {
         List<MenuItem> unlocked = new ArrayList<>();
 
         Set<String> potatoNames = new LinkedHashSet<>();
         Set<String> toppingNames = new LinkedHashSet<>();
 
+//        ambil potato di level sebelumnya
         for (int i = 1; i <= level; i++) {
             List<String> potatoes = unlockedPotatoes.get(i);
             if (potatoes != null) {
                 potatoNames.addAll(potatoes);
             }
-
+//            check potato yg sudah kebuka
             List<String> toppings = unlockedToppings.get(i);
             if (toppings != null) {
                 toppingNames.addAll(toppings);
             }
         }
-
+        
+//        nampilin semua objek potato nama,harga,type
         for (String name : potatoNames) {
             Potato p = new Potato(name, getPotatoPrice(name), getPotatoImage(name));
             p.setUpgradeLevel(player.getUpgradeLevel(name));
             unlocked.add(p);
         }
-
+        
+//        nampilin semua objek sauce/topping nama,harga,type
         for (String name : toppingNames) {
             String type = isSauce(name) ? "sauce" : "topping";
             Topping t = new Topping(name, getToppingPrice(name), type, level, getToppingImage(name));
@@ -72,6 +79,7 @@ public class MenuUnlock {
 
     // === Helper ===
 
+//    nentuin apakah ini sauce
     private static boolean isSauce(String name) {
         return "Tomato".equalsIgnoreCase(name) || "Mayo".equalsIgnoreCase(name);
     }
@@ -86,6 +94,7 @@ public class MenuUnlock {
         return 0;
     }
 
+//    ambil gambar aja
     private static String getPotatoImage(String name) {
         return "assets/potato_" + name.toLowerCase() + ".png";
     }
@@ -99,10 +108,13 @@ public class MenuUnlock {
         return 0;
     }
 
+//    ambil gambar aja
     private static String getToppingImage(String name) {
         return "assets/topping_" + name.toLowerCase() + ".png";
     }
 
+    
+//    buat lebih singkat dalam simpan kata kata
     private static List<String> createList(String... items) {
         List<String> list = new ArrayList<>();
         for (String item : items) {

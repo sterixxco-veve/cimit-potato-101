@@ -686,14 +686,14 @@ public class GamePanel extends JPanel implements KeyListener {
         layeredPane.repaint();
     }
 
-    private void goBackToSlots() {
-        gameEnded = true;
-        if (gameTimer != null) gameTimer.stop();
-        if (updateTimer != null) updateTimer.stop();
-        if (mainFrame != null) {
-            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
-        }
-    }
+//    private void goBackToSlots() {
+//        gameEnded = true;
+//        if (gameTimer != null) gameTimer.stop();
+//        if (updateTimer != null) updateTimer.stop();
+//        if (mainFrame != null) {
+//            mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
+//        }
+//    }
     
     private void goBackToLevel(){
         gameEnded = true;
