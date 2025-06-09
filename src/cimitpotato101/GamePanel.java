@@ -53,7 +53,7 @@ public class GamePanel extends JPanel implements KeyListener {
     private JLabel[] ovenLabels = new JLabel[6];
     private int[][] koordinat = {{450,275}, {600,275},{450,375}, {600,375}}; // Koordinat Piring
     private JLabel[] piringLabels = new JLabel[4];
-    private Potato[] arrKentang = {new EmptyPotato(), new EmptyPotato(), new EmptyPotato(), new EmptyPotato()};
+    private Potato[] arrKentang = {new EmptyPotato(), new EmptyPotato(), new EmptyPotato(), new EmptyPotato()}; // bikin piring kosong itu namanya emptypotato biar bisa ngelakuin pengecekan piring kosong
     private int[][] koordinatToppingSources = {{100,330}, {235,335}, {130,280}, {720,340}, {820, 340}};
     private ArrayList<Topping> availableToppings = new ArrayList<>();
 
@@ -343,6 +343,7 @@ public class GamePanel extends JPanel implements KeyListener {
     }
 
 
+    //method array oven
     private void setupOvenUI() {
         for (int i = 0; i < 6; i++) {
             String ovenImagePath = "/assets/oven.png";
@@ -361,7 +362,7 @@ public class GamePanel extends JPanel implements KeyListener {
                 ovenNameLabels[i] = new JLabel(currentOvenName, SwingConstants.CENTER);
                 ovenNameLabels[i].setForeground(Color.WHITE);
                 ovenNameLabels[i].setFont(new Font("Arial", Font.BOLD, 12)); 
-                ovenNameLabels[i].setBounds(x + i * 125, y - 18, 100, 20); // Sedikit diturunkan dari y - 20
+                ovenNameLabels[i].setBounds(x + i * 125, y - 18, 100, 20); 
                 layeredPane.add(ovenNameLabels[i], Integer.valueOf(3)); 
 
                 final int ovenIndex = i;
@@ -378,6 +379,7 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
 
+    // kalo oven di klik, dia lagi masak jdi asset e berubah jdi oven nyala
     private void handleOvenClick(int ovenIndex) {
         if (GamePanel.this.ovenLogic == null || ovenIndex >= GamePanel.this.ovenLogic.length || GamePanel.this.ovenLogic[ovenIndex] == null) {
             System.err.println("Error: ovenLogic not initialized or index out of bounds for oven " + ovenIndex);
@@ -394,6 +396,7 @@ public class GamePanel extends JPanel implements KeyListener {
                     ovenLabels[ovenIndex].setIcon(new ImageIcon(ovenNyalaUrl));
                 }
             }
+            // ini kalo dia mateng dia bakal cek piring yg kosong dulu ( yang instance of empty potato, kalo gada yg kosong ya dia gabisa di keluarin dri oven (method takeout)
         } else if (selectedOven.isReady()) {
             for (int piringIdx = 0; piringIdx < arrKentang.length; piringIdx++) {
                 if (arrKentang[piringIdx] instanceof EmptyPotato) {
@@ -403,6 +406,7 @@ public class GamePanel extends JPanel implements KeyListener {
                         arrKentang[piringIdx] = (newPotato != null) ? newPotato : new EmptyPotato();
                         if (newPotato == null) System.err.println("Unknown potato type from oven: " + cookedPotatoType);
                         
+                        // ngembaliin oven ke default kalo dah ga occuopied
                         URL ovenDefaultUrl = getClass().getResource("/assets/oven.png");
                         if (ovenDefaultUrl != null && ovenLabels[ovenIndex] != null) {
                             ovenLabels[ovenIndex].setIcon(new ImageIcon(ovenDefaultUrl));
@@ -418,6 +422,7 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
 
+    // set tempat" lokasi piring e berdasarkan koordinat yang kubikin buat tiap piring ( dimana disini aku pake array 2d buat nyimpen koordinat)
     private void setupPiringUI() {
         for (int i = 0; i < 4; i++) {
             String piringImagePath = arrKentang[i].getImagePath();
@@ -544,65 +549,69 @@ public class GamePanel extends JPanel implements KeyListener {
     }
 
 
+    // method buat pemberian topping
     private void setupToppingSauceSourcesUI() {
-    String[] itemAssetNames = {"bacon", "cheese", "pepperoin", "mayo", "tomato"}; 
-    for (int i = 0; i < itemAssetNames.length ; i++) {
-        String itemPath = "/assets/" + itemAssetNames[i] + ".png"; 
-        URL itemUrl = getClass().getResource(itemPath);
-        if (itemUrl != null) {
-            ImageIcon itemIcon = new ImageIcon(itemUrl);
-            JLabel itemLabel = new JLabel(itemIcon);
-            itemLabel.setBounds(koordinatToppingSources[i][0], koordinatToppingSources[i][1], 80, 80); 
-            layeredPane.add(itemLabel, Integer.valueOf(3));
+        String[] itemAssetNames = {"bacon", "cheese", "pepperoin", "mayo", "tomato"}; 
+        for (int i = 0; i < itemAssetNames.length ; i++) {
+            String itemPath = "/assets/" + itemAssetNames[i] + ".png"; 
+            URL itemUrl = getClass().getResource(itemPath);
+            if (itemUrl != null) {
+                ImageIcon itemIcon = new ImageIcon(itemUrl);
+                JLabel itemLabel = new JLabel(itemIcon);
+                itemLabel.setBounds(koordinatToppingSources[i][0], koordinatToppingSources[i][1], 80, 80); 
+                layeredPane.add(itemLabel, Integer.valueOf(3));
 
-            final String itemNameForLogic = itemAssetNames[i]; 
-            itemLabel.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (gameEnded || isPaused) return;
-                    for (int j = 0; j < arrKentang.length; j++) {
-                        Potato rp = new Potato("", 0, "");
-                        if (arrKentang[j] instanceof RegularPotato) {
-                            rp = (RegularPotato) arrKentang[j];
-                        }
-                        else if (arrKentang[j] instanceof ChipsPotato) {
-                            rp = (ChipsPotato) arrKentang[j];
-                        }
-                        else if (arrKentang[j] instanceof CurlyPotato) {
-                            rp = (CurlyPotato) arrKentang[j];
-                        }
-                        else if (arrKentang[j] instanceof WedgesPotato) {
-                            rp = (WedgesPotato) arrKentang[j];
-                        } else if (arrKentang[j] instanceof TornadoPotato) {
-                            rp = (TornadoPotato) arrKentang[j];
-                        } else if (arrKentang[j] instanceof MashedPotato) {
-                            rp = (MashedPotato) arrKentang[j];
-                        }
-                        if(!rp.getNama().equals("")){
-                            boolean success=false;
-                            for (Topping t : availableToppings) {
-                                if (t.getNama().equalsIgnoreCase(itemNameForLogic)) {
-                                    if(rp.addTopping(t)){
-                                        System.out.println("Added " + itemNameForLogic + " to "+rp.getNama()+" on piring " + j + ". Current toppings: " + rp.getToppings());
-                                        success=true;
+                final String itemNameForLogic = itemAssetNames[i]; 
+                itemLabel.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        if (gameEnded || isPaused) return;
+                        for (int j = 0; j < arrKentang.length; j++) {
+                            Potato rp = new Potato("", 0, "");
+                            if (arrKentang[j] instanceof RegularPotato) {
+                                // ngelakuin upcasting
+                                rp = (RegularPotato) arrKentang[j];
+                            }
+                            else if (arrKentang[j] instanceof ChipsPotato) {
+                                rp = (ChipsPotato) arrKentang[j];
+                            }
+                            else if (arrKentang[j] instanceof CurlyPotato) {
+                                rp = (CurlyPotato) arrKentang[j];
+                            }
+                            else if (arrKentang[j] instanceof WedgesPotato) {
+                                rp = (WedgesPotato) arrKentang[j];
+                            } else if (arrKentang[j] instanceof TornadoPotato) {
+                                rp = (TornadoPotato) arrKentang[j];
+                            } else if (arrKentang[j] instanceof MashedPotato) {
+                                rp = (MashedPotato) arrKentang[j];
+                            }
+                            if(!rp.getNama().equals("")){
+                                boolean success=false;
+                                // pemasangan topping
+                                for (Topping t : availableToppings) {
+                                    if (t.getNama().equalsIgnoreCase(itemNameForLogic)) {
+                                        if(rp.addTopping(t)){
+                                            System.out.println("Added " + itemNameForLogic + " to "+rp.getNama()+" on piring " + j + ". Current toppings: " + rp.getToppings());
+                                            success=true;
+                                        }
                                     }
                                 }
-                            }
-                            if(success){
-                               updatePiringVisuals(); 
-                               break; 
-                            }
-                       }
+                                // kalo berhasil dia bakal update visual piring nya
+                                if(success){
+                                   updatePiringVisuals(); 
+                                   break; 
+                                }
+                           }
+                        }
                     }
-                }
-            });
-        } else {
-            System.err.println("Item (Topping/Sauce) image not found: " + itemPath);
+                });
+            } else {
+                System.err.println("Item (Topping/Sauce) image not found: " + itemPath);
+            }
         }
     }
-}
 
-    
+    // ya tombol pause sih
     private void setupPauseButton() {
         String pauseImagePath = "/assets/pauseButton.png";
         URL pauseUrl = getClass().getResource(pauseImagePath);
@@ -615,6 +624,7 @@ public class GamePanel extends JPanel implements KeyListener {
             pauseButton.setFocusPainted(false);
             layeredPane.add(pauseButton, Integer.valueOf(JLayeredPane.MODAL_LAYER + 1)); 
 
+            // mouse on clicked
             pauseButton.addActionListener(e -> {
                 if(gameEnded) return;
                 handlePauseAction();
@@ -1054,6 +1064,7 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
     
+    // method buat jalanin timer
     private void startGameTimers() {
         if (gameEnded || timerStarted) { 
             if(timerStarted && gameTimer != null && gameTimer.isRunning()){

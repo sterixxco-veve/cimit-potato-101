@@ -61,7 +61,6 @@ public class SlotPanel extends JPanel {
         
         for (int i = 0; i < 3; i++) {
             SaveSlotData data = SaveSlotUtils.loadSlotData(i + 1);
-            // --- PERUBAHAN 2: Buat SlotCard dan simpan ke dalam array ---
             slotCards[i] = new SlotCard(i + 1, data.getPlayerName(), data.getLevel(), data.getStars(), data.getTrophyType(), mainFrame);
             rowPanel.add(slotCards[i]);
         }

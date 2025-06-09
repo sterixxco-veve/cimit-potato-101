@@ -15,9 +15,6 @@ public class MainPanel extends JFrame {
     private FinalTrophyPanel finalTrophyPanel;
     private LevelSelectMenu levelSelectMenu;
     private SlotPanel slotPanel;
-    // Tambahkan field ini jika Anda membutuhkannya untuk menyimpan state antar pemanggilan
-    // private Player currentPlayerForGame; 
-    // private int currentLevelForGame;   
 
     public MainPanel() {
         setBackground(Color.yellow);
@@ -34,8 +31,6 @@ public class MainPanel extends JFrame {
         cardPanel.add(new MenuPanel(this), "menu"); 
         cardPanel.add(new SlotPanel(this), "slots");
         
-        // Jangan tambahkan GamePanel di sini jika akan dibuat dinamis
-        // cardPanel.add(new GamePanel(), "game"); // HAPUS ATAU KOMENTARI BARIS INI
         this.slotPanel = new SlotPanel(this); 
         cardPanel.add(this.slotPanel, "slots");
         
@@ -48,7 +43,7 @@ public class MainPanel extends JFrame {
             finalTrophyPanel = new FinalTrophyPanel(this, player, slotData, gameSlotNumber);
             cardPanel.add(finalTrophyPanel, "finalTrophyScreen"); // "finalTrophyScreen" adalah nama untuk CardLayout
         } else {
-            // Jika panel sudah ada, update kontennya
+            // Jika panel sudah ada, update content di slotcard
             finalTrophyPanel.updateContent(player, slotData, gameSlotNumber);
         }
         cardLayout.show(cardPanel, "finalTrophyScreen");
@@ -62,9 +57,9 @@ public class MainPanel extends JFrame {
         return cardPanel;
     }
 
-    // Metode startGame diubah untuk menerima slotNumber
+    // Metode startGame diubah untuk menerima slot nomer brp
     public void startGame(SaveSlotData slotData, int slotNumber) {
-        // 1. Buat atau muat Player berdasarkan slotData
+        // 1. bikin atau load Player berdasarkan slotData
         Player gamePlayer = loadOrCreatePlayer(slotData); 
 
         // 2. Level yang akan dimainkan (dari slotData)
@@ -85,31 +80,32 @@ public class MainPanel extends JFrame {
         Player player = new Player(slotData.getPlayerName()); 
         player.setCurrentLevel(slotData.getLevel()); 
         player.setStars(slotData.getStars()); 
-        player.setGold(slotData.getGold()); // Set gold awal menjadi 0, atau sesuai logika game Anda
+        player.setGold(slotData.getGold()); 
         player.initializeUpgradeLevels(); 
         return player;
     }
     
     public void showLevelSelectMenu(Player player, SaveSlotData slotData, int slotNumber) {
-    // Hapus panel level lama jika ada
         for (Component comp : cardPanel.getComponents()) {
             if (comp instanceof LevelSelectMenu) {
                 cardPanel.remove(comp);
                 break;
             }
         }
-        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber);
+        LevelSelectMenu levelSelectPanel = new LevelSelectMenu(this, player, slotData, slotNumber); //Panel ini dibuat dengan data pemain dan slot saat ini, sehingga bisa nampiliin informasi yang benar (misalnya, level mana saja yang sudah terbuka).
         cardPanel.add(levelSelectPanel, "level");
         cardLayout.show(cardPanel, "level");
-        levelSelectPanel.refreshHUD();
+        levelSelectPanel.refreshHUD(); //memperbarui tampilan informasi di layar, seperti jumlah emas atau bintang pemain
     }
     
+    // buat nampilin panel landing page
     public void showMainMenu() {
         cardLayout.show(cardPanel, "menu");
     }
     
+    // buat nampilin panel choose slot
     public void showSlotSelectionScreen() {
-        // Panggil refresh() terlebih dahulu
+        // Panggil refresh() biar dee ke refresh content slotcard e
         slotPanel.refresh(); 
 
         // Kemudian tampilkan panelnya

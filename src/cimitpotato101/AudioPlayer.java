@@ -17,9 +17,10 @@ public class AudioPlayer {
     String filePath;
     public AudioPlayer(){
         this.filePath = "/assets/music.wav";
+        // jadi biar begitu objek AudioPlayer dibuat, musik akan langsung diputar secara otomatis
         playSound();
     }
-    
+    // synchronized disini memastikan hanya satu thread yang jalan jadi audio bisa di play tanpa gangguan dri thread lain
     public synchronized void playSound() {
         new Thread(() -> {
             try {
@@ -27,6 +28,7 @@ public class AudioPlayer {
                 AudioInputStream inputStream = AudioSystem.getAudioInputStream(AudioPlayer.class.getResourceAsStream(filePath));
                 clip.open(inputStream);
                 clip.start();
+                // buat looping
                 clip.loop(Clip.LOOP_CONTINUOUSLY);
                 
             } catch (Exception e) {

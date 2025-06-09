@@ -22,7 +22,7 @@ import javax.swing.JPanel;
  *
  * @author Aspire
  */
-// MenuPanel dengan tombol play yang pindah ke SlotPanel
+// ini landing page
 public class MenuPanel extends JPanel {
     private MainPanel mainFrame;
 
@@ -47,13 +47,15 @@ public class MenuPanel extends JPanel {
                 System.out.println("Gambar play button tidak ditemukan!");
                 playButton = new JButton("Play");
             }
-
+            
+            // biar transparan bg
             playButton.setBorderPainted(false);
             playButton.setContentAreaFilled(false);
             playButton.setFocusPainted(false);
             playButton.setOpaque(false);
             playButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
+            // cursor jdi kek onclicked
             playButton.addActionListener(e -> {
                 mainFrame.getCardLayout().show(mainFrame.getCardPanel(), "slots");
             });

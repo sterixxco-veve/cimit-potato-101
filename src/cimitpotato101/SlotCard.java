@@ -31,7 +31,6 @@ public class SlotCard extends JPanel {
     private final MainPanel mainFrame;
     private String trophyType;
 
-    // --- PERUBAHAN 1: Jadikan label sebagai fields (variabel instance) ---
     private JLabel playerNameLabel;
     private JLabel levelLabel;
     private JLabel starsLabel;
@@ -112,10 +111,6 @@ public class SlotCard extends JPanel {
         add(playBtn);
     }
 
-    // --- PERUBAHAN 2: Buat method refresh() publik ---
-    /**
-     * Memperbarui data visual pada card ini dengan memuat ulang dari file.
-     */
     public void refresh() {
         SaveSlotData data = SaveSlotUtils.loadSlotData(this.slotNumber);
         
