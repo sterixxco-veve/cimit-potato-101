@@ -166,7 +166,7 @@ public class GamePanel extends JPanel implements KeyListener {
         layeredPane.repaint();
     }
     
-//    ini code buat x 
+//    cheatcode aja 
     public void keyPressed(KeyEvent e) {
         // Hentikan jika game sudah berakhir untuk mencegah cheat diaktifkan berkali-kali
         if (gameEnded) {
@@ -191,6 +191,10 @@ public class GamePanel extends JPanel implements KeyListener {
             endGame(1); // Langsung akhiri ronde dengan hasil 1 bintang
         }
     }
+    
+    
+///   Karena pakai KeyListener, harus isi 3 method.
+//    Mau dipakai atau tidak, tetap harus ditulis."
 
     @Override
     public void keyReleased(KeyEvent e) {
@@ -515,8 +519,13 @@ public class GamePanel extends JPanel implements KeyListener {
         return name.toLowerCase().replace(" potato", "").trim();
     }
 
+    
+    
+//  Cek apakah pesanan yang disajikan benar sesuai dengan permintaan customer.
     private boolean checkOrderMatch(Potato servedPotato, Customer customer) {
         if (customer == null || servedPotato == null || customer.getPotato() == null) return false;
+        
+//      Untuk membandingkan nama kentang yang disajikan dan yang dipesan
         String servedPotatoCleanName = normalizeItemName(servedPotato.getNama());
         String customerExpectedPotatoCleanName = normalizeItemName(customer.getPotato().getNama());
 
@@ -525,6 +534,7 @@ public class GamePanel extends JPanel implements KeyListener {
             return false;
         }
 
+//      Untuk membandingkan nama topping yang disajikan dan yang dipesan
         String toppingKentang = servedPotato.getToppings().size()>0?servedPotato.getToppings().get(0):"";
         String sausKentang = servedPotato.getSauces().size()>0?servedPotato.getSauces().get(0):"";
 
@@ -860,21 +870,26 @@ public class GamePanel extends JPanel implements KeyListener {
     private void updateActiveCustomerPatienceAndHandleDeparture() { 
         if(gameEnded || isPaused) return; // Tambahkan check isPaused
         boolean customerChanged = false;
+//        for untuk cek slot 1,2,3
         for (int i = 0; i < MAX_VISIBLE_CUSTOMERS; i++) {
             if (activeCustomersInSlots[i] != null) {
                 activeCustomersInSlots[i].decreasePatience(1); 
                 if (activeCustomersInSlots[i].isAngry()) {
+//                  customer marah dan pergi karena menunggu terlalu lama                   
                     System.out.println("Customer " + activeCustomersInSlots[i].getCustomerImageID() + " di slot " + i + " marah dan pergi!");
+//                  dapet hukuman gold nya berkurang
                     int goldPenalty = -10;
                     this.goldEarnedThisLevel += goldPenalty;
                     if (this.goldEarnedThisLevel < 0) {
                         this.goldEarnedThisLevel = 0;
                     }
-                    
+//                    pastikan gold pemain ga minus
                     if(currentPlayer.getGold() < 0) currentPlayer.setGold(0); 
                     
+//                    customer nya berkurang dong
                     customersLeftInLevel--; 
                     
+//                    hapus customer karena ngambek
                     activeCustomersInSlots[i] = null; 
                     customerChanged = true; 
                     updateTopInfoUILabels(); 
@@ -895,7 +910,8 @@ public class GamePanel extends JPanel implements KeyListener {
         return false;
     }
     
-    // PINTU MASUK 1: Untuk Cheat Code dari keyPressed(KeyEvent e)
+    // PINTU MASUK 1: Untuk yg pakai Cheat Code dari keyPressed(KeyEvent e)
+//    Dianggap selalu sukses menyelesaikan level (karena cheat memaksa selesai)
     public void endGame(int starsFromCheat) {
         // Cheat selalu dianggap berhasil menyelesaikan level
         boolean levelSuccessfullyCompleted = true;
@@ -906,16 +922,19 @@ public class GamePanel extends JPanel implements KeyListener {
 
     // PINTU MASUK 2: Untuk Alur Game Normal (panggil ini dari tempat Anda memanggil endGame sebelumnya)
     public void endGame(boolean allServedSuccessfully) {
-        // --- HITUNG BINTANG BERDASARKAN GOLD (Logika asli Anda) ---
+        // HITUNG BINTANG BERDASARKAN GOLD 
         int starsGained = 0;
         if (this.activeLevel != null && this.activeLevel.getStarGoldThresholds() != null) {
             int[] thresholds = this.activeLevel.getStarGoldThresholds();
             if (thresholds.length == 3) {
                 if (this.goldEarnedThisLevel >= thresholds[2]) {
+//                    kalo gold nya 300 dapet 3 bintang
                     starsGained = 3;
                 } else if (this.goldEarnedThisLevel >= thresholds[1]) {
+//                    kalo gold nya 200 dapet 2 bintang
                     starsGained = 2;
                 } else if (this.goldEarnedThisLevel >= thresholds[0]) {
+//                    kalo gold nya 100 dapet 1 bintang
                     starsGained = 1;
                 }
             }
@@ -1050,6 +1069,9 @@ public class GamePanel extends JPanel implements KeyListener {
         }
     }
     
+    
+    
+//    menghasilkan objek Potato yang sesuai dengan nama yang dikirim.
     private Potato createPotatoInstance(String potatoOvenName) {
         if (potatoOvenName == null) return new EmptyPotato();
         String cleanName = potatoOvenName.toLowerCase().trim(); 
@@ -1061,6 +1083,7 @@ public class GamePanel extends JPanel implements KeyListener {
             case "tornado": return new TornadoPotato();
             case "mashed": return new MashedPotato();
             default:
+//                kalo kentang ga cocock bakalan print di bawah ini
                 System.err.println("Unknown potato type for instance creation from oven name: " + potatoOvenName + " (cleaned: " + cleanName + ")");
                 return new EmptyPotato();
         }
@@ -1132,14 +1155,16 @@ public class GamePanel extends JPanel implements KeyListener {
     public void addNotify() {
         super.addNotify();
         
-           // Supaya bisa menangkap input keyboard
-            setFocusable(true);
-            requestFocusInWindow();
-            addKeyListener(this);
+          
+            setFocusable(true); // Supaya bisa menangkap input keyboard
+            requestFocusInWindow();//buat cheatcode z,x,c
+            addKeyListener(this); //mendengarkan tombol keyboard.
+            
         if (!timerStarted && !gameEnded && this.activeLevel != null) { 
-            startGameTimers();
+            startGameTimers();  //Mulai game jika belum dimulai
+            
         } else if (this.activeLevel == null) {
             System.err.println("addNotify called but activeLevel is null. Timers not started.");
-        }
+        } //kalo belom saat nya naik level tampilkan print
     }
 }
